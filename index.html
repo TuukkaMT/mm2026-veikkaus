@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MM 2026 Veikkaus</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a}
+    :root{
+      --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      --color-background-primary:#ffffff;
+      --color-background-secondary:#f5f5f5;
+      --color-background-tertiary:#ebebeb;
+      --color-background-success:#e8f5e9;
+      --color-background-warning:#fff8e1;
+      --color-background-danger:#ffebee;
+      --color-background-info:#e3f2fd;
+      --color-text-primary:#1a1a1a;
+      --color-text-secondary:#555555;
+      --color-text-tertiary:#999999;
+      --color-text-success:#2e7d32;
+      --color-text-warning:#e65100;
+      --color-text-danger:#c62828;
+      --color-text-info:#1565c0;
+      --color-border-tertiary:rgba(0,0,0,0.10);
+      --color-border-secondary:rgba(0,0,0,0.18);
+      --color-border-primary:rgba(0,0,0,0.30);
+      --color-border-success:#a5d6a7;
+      --color-border-warning:#ffcc02;
+      --color-border-danger:#ef9a9a;
+      --color-border-info:#90caf9;
+      --border-radius-md:8px;
+      --border-radius-lg:12px;
+      --border-radius-xl:16px;
+    }
+    @media(prefers-color-scheme:dark){
+      :root{
+        --color-background-primary:#1e1e1e;
+        --color-background-secondary:#2a2a2a;
+        --color-background-tertiary:#333333;
+        --color-background-success:#1b3a1e;
+        --color-background-warning:#3a2800;
+        --color-background-danger:#3a1414;
+        --color-text-primary:#f0f0f0;
+        --color-text-secondary:#aaaaaa;
+        --color-text-tertiary:#666666;
+        --color-text-success:#81c784;
+        --color-text-warning:#ffb74d;
+        --color-text-danger:#ef9a9a;
+        --color-border-tertiary:rgba(255,255,255,0.10);
+        --color-border-secondary:rgba(255,255,255,0.18);
+        --color-border-primary:rgba(255,255,255,0.30);
+      }
+      body{background:#121212}
+    }
+    input[type=number]{-moz-appearance:textfield}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .chip-base{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);cursor:pointer;font-size:12px;color:var(--color-text-secondary);font-family:var(--font-sans);overflow:hidden;white-space:nowrap}
+    .chip-base span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .chip-sel-s{background:var(--color-background-success)!important;border:0.5px solid var(--color-border-success)!important;color:var(--color-text-success)!important;font-weight:500}
+    .chip-sel-w{background:var(--color-background-warning)!important;border:0.5px solid var(--color-border-warning)!important;color:var(--color-text-warning)!important;font-weight:500}
+    .match-row{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:9px 10px;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+    .match-row.done{border-color:var(--color-border-success)}
+    .sign-badge{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:var(--border-radius-md);font-size:12px;font-weight:500;background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+    .sign-1{background:var(--color-background-success);color:var(--color-text-success)}
+    .sign-X{background:var(--color-background-warning);color:var(--color-text-warning)}
+    .sign-2{background:var(--color-background-danger);color:var(--color-text-danger)}
+    .score-inp{width:44px;height:40px;text-align:center;font-size:16px;font-weight:500;background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);color:var(--color-text-primary);font-family:var(--font-sans)}
+    .grp-btn{width:34px;height:34px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);background:var(--color-background-primary);cursor:pointer;font-size:13px;color:var(--color-text-secondary);font-family:var(--font-sans)}
+    .grp-btn.active{border:1.5px solid var(--color-border-primary);background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500}
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:5px}
+    .sec-title{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+    .badge{font-size:11px;padding:2px 8px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-tertiary)}
+    .badge.ok{background:var(--color-background-success);color:var(--color-text-success);font-weight:500}
+    .lb-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:5px}
+    .lb-row.me{background:var(--color-background-success);border-color:var(--color-border-success)}
+    #root{max-width:720px;margin:0 auto;min-height:100vh;background:var(--color-background-primary)}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+
+// ═══════════════════════════════════════════════════
+//  KONFIGURAATIO — Vaihda ennen käyttöä!
+// ═══════════════════════════════════════════════════
+const DB_URL = "https://mm2026-veikkaus-default-rtdb.europe-west1.firebasedatabase.app";
+const ADMIN_PW = "finaali2026";
+
+// ═══════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════
+const GROUPS = {
+  A: ["Meksiko","Etelä-Afrikka","Etelä-Korea","Tšekki"],
+  B: ["Kanada","Bosnia-H.","Qatar","Sveitsi"],
+  C: ["Brasilia","Marokko","Haiti","Skotlanti"],
+  D: ["USA","Paraguay","Australia","Türkiye"],
+  E: ["Saksa","Curaçao","Norsunluurannikko","Ecuador"],
+  F: ["Alankomaat","Japani","Ruotsi","Tunisia"],
+  G: ["Belgia","Egypti","Iran","Uusi-Seelanti"],
+  H: ["Espanja","Kap Verde","Saudi-Arabia","Uruguay"],
+  I: ["Ranska","Senegal","Irak","Norja"],
+  J: ["Argentiina","Algeria","Itävalta","Jordania"],
+  K: ["Portugali","Kongo DR","Uzbekistan","Kolumbia"],
+  L: ["Englanti","Kroatia","Ghana","Panama"],
+};
+
+const FLAGS = {
+  "Meksiko":"🇲🇽","Etelä-Afrikka":"🇿🇦","Etelä-Korea":"🇰🇷","Tšekki":"🇨🇿",
+  "Kanada":"🇨🇦","Bosnia-H.":"🇧🇦","Qatar":"🇶🇦","Sveitsi":"🇨🇭",
+  "Brasilia":"🇧🇷","Marokko":"🇲🇦","Haiti":"🇭🇹","Skotlanti":"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+  "USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷",
+  "Saksa":"🇩🇪","Curaçao":"🇨🇼","Norsunluurannikko":"🇨🇮","Ecuador":"🇪🇨",
+  "Alankomaat":"🇳🇱","Japani":"🇯🇵","Ruotsi":"🇸🇪","Tunisia":"🇹🇳",
+  "Belgia":"🇧🇪","Egypti":"🇪🇬","Iran":"🇮🇷","Uusi-Seelanti":"🇳🇿",
+  "Espanja":"🇪🇸","Kap Verde":"🇨🇻","Saudi-Arabia":"🇸🇦","Uruguay":"🇺🇾",
+  "Ranska":"🇫🇷","Senegal":"🇸🇳","Irak":"🇮🇶","Norja":"🇳🇴",
+  "Argentiina":"🇦🇷","Algeria":"🇩🇿","Itävalta":"🇦🇹","Jordania":"🇯🇴",
+  "Portugali":"🇵🇹","Kongo DR":"🇨🇩","Uzbekistan":"🇺🇿","Kolumbia":"🇨🇴",
+  "Englanti":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Kroatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦",
+};
+
+const ALL_MATCHES = (() => {
+  const m = [];
+  Object.entries(GROUPS).forEach(([g, teams]) => {
+    let n = 1;
+    for (let i = 0; i < 4; i++)
+      for (let j = i+1; j < 4; j++)
+        m.push({ id:`${g}${n++}`, group:g, home:teams[i], away:teams[j] });
+  });
+  return m;
+})();
+
+const ALL_TEAMS = Object.values(GROUPS).flat();
+const EMPTY = () => ({ matches:{}, advancement:[], r32:[], r16:[], qf:[], sf:[], champion:"" });
+
+// ═══════════════════════════════════════════════════
+//  FIREBASE REST API
+// ═══════════════════════════════════════════════════
+const fb = {
+  get: async (path) => {
+    try {
+      const r = await fetch(`${DB_URL}/${path}.json`);
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  },
+  set: async (path, data) => {
+    try {
+      await fetch(`${DB_URL}/${path}.json`, {
+        method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)
+      });
+    } catch {}
+  },
+  patch: async (path, data) => {
+    try {
+      await fetch(`${DB_URL}/${path}.json`, {
+        method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify(data)
+      });
+    } catch {}
+  },
+};
+
+// ═══════════════════════════════════════════════════
+//  PISTEYTYSFUNKTIO
+// ═══════════════════════════════════════════════════
+const sign = (h, a) => {
+  if (h===""||a===""||h===undefined||a===undefined) return null;
+  return +h>+a ? "1" : +h<+a ? "2" : "X";
+};
+
+const calcScore = (p, r) => {
+  if (!p||!r) return 0;
+  let s = 0;
+  ALL_MATCHES.forEach(({ id }) => {
+    const pm = p.matches?.[id], rm = r.matches?.[id];
+    if (!pm||!rm||rm.h===undefined||rm.a===undefined) return;
+    if (+pm.h===+rm.h && +pm.a===+rm.a) s += 4;
+    else if (sign(pm.h,pm.a) === sign(rm.h,rm.a)) s += 2;
+  });
+  const ra = new Set(r.advancement||[]);
+  (p.advancement||[]).forEach(t => ra.has(t) && s++);
+  [["r32",1],["r16",2],["qf",3],["sf",4]].forEach(([rnd,pts]) => {
+    const rs = new Set(r[rnd]||[]);
+    (p[rnd]||[]).forEach(t => rs.has(t) && (s += pts));
+  });
+  if (p.champion && p.champion===r.champion) s += 8;
+  return s;
+};
+
+// ═══════════════════════════════════════════════════
+//  TYYLIT
+// ═══════════════════════════════════════════════════
+const S = {
+  app:    { fontFamily:"var(--font-sans)", maxWidth:720, margin:"0 auto", paddingBottom:80 },
+  header: { padding:"13px 20px", borderBottom:"0.5px solid var(--color-border-tertiary)", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:100, background:"var(--color-background-primary)" },
+  tabBar: { display:"flex", borderBottom:"0.5px solid var(--color-border-tertiary)", position:"sticky", top:50, zIndex:99, background:"var(--color-background-primary)", overflowX:"auto" },
+  tab:    (a) => ({ flex:"1 0 auto", padding:"11px 10px", border:"none", background:"none", cursor:"pointer", fontSize:13, fontWeight:a?500:400, color:a?"var(--color-text-primary)":"var(--color-text-secondary)", borderBottom:a?"2px solid var(--color-text-primary)":"2px solid transparent", whiteSpace:"nowrap" }),
+  content: { padding:"16px 20px" },
+  card:    { background:"var(--color-background-primary)", border:"0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-lg)", padding:"12px 16px", marginBottom:8 },
+  matchRow: (done) => ({ background:"var(--color-background-primary)", border:done?"0.5px solid var(--color-border-success)":"0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-lg)", padding:"9px 12px", marginBottom:5, display:"flex", alignItems:"center", gap:6 }),
+  scoreInput: { width:44, height:40, textAlign:"center", fontSize:16, fontWeight:500, background:"var(--color-background-secondary)", border:"0.5px solid var(--color-border-secondary)", borderRadius:"var(--border-radius-md)", color:"var(--color-text-primary)", WebkitAppearance:"none", MozAppearance:"textfield" },
+  signBadge: (s) => {
+    const c = s==="1" ? ["var(--color-background-success)","var(--color-text-success)"]
+             : s==="X" ? ["var(--color-background-warning)","var(--color-text-warning)"]
+             : s==="2" ? ["var(--color-background-danger)","var(--color-text-danger)"]
+             : ["var(--color-background-secondary)","var(--color-text-tertiary)"];
+    return { width:28, height:28, display:"flex", alignItems:"center", justifyContent:"center", borderRadius:"var(--border-radius-md)", fontSize:12, fontWeight:500, background:c[0], color:c[1] };
+  },
+  grpBtn: (a) => ({ width:34, height:34, border:a?"1.5px solid var(--color-border-primary)":"0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-md)", background:a?"var(--color-background-secondary)":"var(--color-background-primary)", cursor:"pointer", fontSize:13, fontWeight:a?500:400, color:a?"var(--color-text-primary)":"var(--color-text-secondary)" }),
+  chip:   (sel, danger) => ({ display:"flex", alignItems:"center", gap:6, padding:"7px 10px", background: danger&&sel ? "var(--color-background-warning)" : sel ? "var(--color-background-success)" : "var(--color-background-secondary)", border: danger&&sel ? "0.5px solid var(--color-border-warning)" : sel ? "0.5px solid var(--color-border-success)" : "0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-md)", cursor:"pointer", fontSize:12, fontWeight:sel?500:400, color: danger&&sel ? "var(--color-text-warning)" : sel ? "var(--color-text-success)" : "var(--color-text-secondary)" }),
+  secTitle: { fontSize:12, fontWeight:500, color:"var(--color-text-secondary)", textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:10, marginTop:20, display:"flex", alignItems:"center", gap:8 },
+  badge:  (ok) => ({ fontSize:11, padding:"2px 8px", borderRadius:"var(--border-radius-md)", background:ok?"var(--color-background-success)":"var(--color-background-secondary)", color:ok?"var(--color-text-success)":"var(--color-text-tertiary)", fontWeight:ok?500:400 }),
+};
+
+// ═══════════════════════════════════════════════════
+//  PÄÄKOMPONENTTI
+// ═══════════════════════════════════════════════════
+function App() {
+  const [loading,    setLoading]    = useState(true);
+  const [userId,     setUserId]     = useState(null);
+  const [userName,   setUserName]   = useState("");
+  const [nameInput,  setNameInput]  = useState("");
+  const [tab,        setTab]        = useState("lohko");
+  const [group,      setGroup]      = useState("A");
+  const [preds,      setPreds]      = useState(EMPTY());
+  const [results,    setResults]    = useState(EMPTY());
+  const [board,      setBoard]      = useState([]);
+  const [boardLoad,  setBoardLoad]  = useState(false);
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const [adminOpen,  setAdminOpen]  = useState(false);
+  const [adminPw,    setAdminPw]    = useState("");
+  const [adminRes,   setAdminRes]   = useState(EMPTY());
+  const [adminGrp,   setAdminGrp]   = useState("A");
+  const [adminSave,  setAdminSave]  = useState(false);
+  const saveTimer = useRef(null);
+  const isConfigured = !DB_URL.includes("YOUR_PROJECT");
+
+  // Inject sr-only style once
+  useEffect(() => {
+    const el = document.createElement("style");
+    el.textContent = `.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}`;
+    document.head.appendChild(el);
+    return () => document.head.removeChild(el);
+  }, []);
+
+  // Init: load saved user from storage
+  useEffect(() => {
+    (async () => {
+      try {
+        const uid   = await window.storage.get("wc26_uid");
+        const uname = await window.storage.get("wc26_name");
+        if (uid?.value && uname?.value) {
+          setUserId(uid.value);
+          setUserName(uname.value);
+          const data = await fb.get(`predictions/${uid.value}`);
+          if (data) setPreds({ ...EMPTY(), ...data });
+        }
+      } catch {}
+      const res = await fb.get("results");
+      if (res) { setResults({ ...EMPTY(), ...res }); setAdminRes({ ...EMPTY(), ...res }); }
+      setLoading(false);
+    })();
+  }, []);
+
+  const login = async () => {
+    if (!nameInput.trim()) return;
+    const uid = `u_${Date.now()}`;
+    try { await window.storage.set("wc26_uid", uid); await window.storage.set("wc26_name", nameInput.trim()); } catch {}
+    await fb.set(`predictions/${uid}`, { ...EMPTY(), name: nameInput.trim() });
+    setUserId(uid);
+    setUserName(nameInput.trim());
+  };
+
+  const scheduleSave = useCallback((np) => {
+    setSaveStatus("saving");
+    clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      if (userId) {
+        await fb.patch(`predictions/${userId}`, np);
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2500);
+      }
+    }, 900);
+  }, [userId]);
+
+  const updateMatch = (id, field, val) => {
+    const np = { ...preds, matches:{ ...preds.matches, [id]:{ ...preds.matches[id], [field]:val } } };
+    setPreds(np); scheduleSave(np);
+  };
+
+  const toggleList = (key, team, max) => {
+    const cur = preds[key]||[];
+    const updated = cur.includes(team) ? cur.filter(t=>t!==team) : cur.length<max ? [...cur,team] : cur;
+    const np = { ...preds, [key]:updated };
+    setPreds(np); scheduleSave(np);
+  };
+
+  const setChamp = (team) => {
+    const np = { ...preds, champion: preds.champion===team ? "" : team };
+    setPreds(np); scheduleSave(np);
+  };
+
+  const loadBoard = async () => {
+    setBoardLoad(true);
+    const [allPreds, res] = await Promise.all([fb.get("predictions"), fb.get("results")]);
+    if (allPreds) {
+      const entries = Object.entries(allPreds)
+        .map(([uid,p]) => ({ name:p.name||"?", score:calcScore(p,res||{}), uid }))
+        .sort((a,b) => b.score-a.score);
+      setBoard(entries);
+    }
+    setBoardLoad(false);
+  };
+
+  useEffect(() => { if (tab==="taulu") loadBoard(); }, [tab]);
+
+  const matchesDone = ALL_MATCHES.filter(m => {
+    const p = preds.matches?.[m.id];
+    return p && p.h!=="" && p.a!=="" && p.h!==undefined && p.a!==undefined;
+  }).length;
+
+  // ── LOADING ──────────────────────────────────────
+  if (loading) return (
+    <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <i className="ti ti-ball-football" style={{ fontSize:36, color:"var(--color-text-tertiary)" }} aria-hidden="true"></i>
+    </div>
+  );
+
+  // ── LOGIN ─────────────────────────────────────────
+  if (!userId) return (
+    <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:24 }}>
+      <h2 className="sr-only">MM 2026 Veikkaus – kirjaudu sisään</h2>
+      <i className="ti ti-ball-football" style={{ fontSize:40, color:"var(--color-text-secondary)", marginBottom:12 }} aria-hidden="true"></i>
+      <h1 style={{ fontSize:22, fontWeight:500, marginBottom:6 }}>MM 2026 Veikkaus</h1>
+      <p style={{ fontSize:14, color:"var(--color-text-secondary)", marginBottom:32 }}>Kaveriporukan veikkaussovellus · USA/Kanada/Meksiko</p>
+      <div style={{ width:"100%", maxWidth:340, background:"var(--color-background-primary)", border:"0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-lg)", padding:"24px" }}>
+        <label style={{ fontSize:12, color:"var(--color-text-secondary)", display:"block", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>Nimesi</label>
+        <input
+          style={{ width:"100%", marginBottom:16, padding:"10px 14px", background:"var(--color-background-secondary)", border:"0.5px solid var(--color-border-secondary)", borderRadius:"var(--border-radius-md)", fontSize:15, color:"var(--color-text-primary)", fontFamily:"var(--font-sans)" }}
+          placeholder="esim. Pekka"
+          value={nameInput}
+          onChange={e => setNameInput(e.target.value)}
+          onKeyDown={e => e.key==="Enter" && login()}
+          autoFocus
+        />
+        <button
+          onClick={login}
+          disabled={!nameInput.trim()}
+          style={{ width:"100%", padding:11, background:"var(--color-text-primary)", color:"var(--color-background-primary)", border:"none", borderRadius:"var(--border-radius-md)", fontSize:14, fontWeight:500, cursor:nameInput.trim()?"pointer":"not-allowed", opacity:nameInput.trim()?1:0.4 }}>
+          Liity veikkaukseen →
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── MAIN APP ──────────────────────────────────────
+  return (
+    <div style={S.app}>
+      <h2 className="sr-only">MM 2026 Veikkaussovellus</h2>
+
+      {/* ── Header ── */}
+      <header style={S.header}>
+        <span style={{ fontSize:14, fontWeight:500 }}>
+          <i className="ti ti-ball-football" style={{ marginRight:6 }} aria-hidden="true"></i>MM 2026
+        </span>
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <span style={{ fontSize:12, color:"var(--color-text-secondary)" }}>{userName}</span>
+          <span style={{ fontSize:11, color:saveStatus==="saved"?"var(--color-text-success)":"var(--color-text-tertiary)", opacity:saveStatus==="idle"?0:1, transition:"opacity 0.3s" }}>
+            {saveStatus==="saving" ? "Tallennetaan..." : "✓ Tallennettu"}
+          </span>
+        </div>
+      </header>
+
+      {/* ── Tab bar ── */}
+      <div style={S.tabBar} role="tablist">
+        {[["lohko","Lohkovaihe"],["jatko","Jatkoon"],["pudotus","Pudotuspelit"],["taulu","Taulu"],["admin","Admin"]].map(([id,label]) => (
+          <button key={id} role="tab" aria-selected={tab===id} style={S.tab(tab===id)} onClick={() => setTab(id)}>{label}</button>
+        ))}
+      </div>
+
+      {/* ── Firebase-varoitus ── */}
+      {!isConfigured && (
+        <div style={{ margin:"12px 20px 0", padding:"10px 14px", background:"var(--color-background-warning)", border:"0.5px solid var(--color-border-warning)", borderRadius:"var(--border-radius-md)", fontSize:13, color:"var(--color-text-warning)" }}>
+          <i className="ti ti-alert-triangle" style={{ marginRight:6 }} aria-hidden="true"></i>
+          Firebase ei ole konfiguroitu — vaihda DB_URL koodissa omaan projektiisi.
+        </div>
+      )}
+
+      <div style={S.content}>
+
+        {/* ════════════════════════════════════════════
+            LOHKOVAIHE
+        ════════════════════════════════════════════ */}
+        {tab==="lohko" && (
+          <div>
+            {/* Edistymispalkki */}
+            <div style={{ marginBottom:20 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6, fontSize:12, color:"var(--color-text-secondary)" }}>
+                <span>Ottelut veikattuna</span>
+                <span style={{ fontWeight:500, color:matchesDone===72?"var(--color-text-success)":"var(--color-text-primary)" }}>{matchesDone} / 72</span>
+              </div>
+              <div style={{ background:"var(--color-background-tertiary)", borderRadius:4, height:4 }}>
+                <div style={{ width:`${(matchesDone/72)*100}%`, height:4, borderRadius:4, background:"var(--color-text-success)", transition:"width 0.4s" }}/>
+              </div>
+            </div>
+
+            {/* Lohkonapit */}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:14 }}>
+              {"ABCDEFGHIJKL".split("").map(g => (
+                <button key={g} style={S.grpBtn(group===g)} onClick={() => setGroup(g)}>{g}</button>
+              ))}
+            </div>
+
+            {/* Lohkon otsikko */}
+            <div style={{ marginBottom:12 }}>
+              <span style={{ fontSize:15, fontWeight:500 }}>Lohko {group}</span>
+              <span style={{ fontSize:12, color:"var(--color-text-tertiary)", marginLeft:10 }}>
+                {GROUPS[group].map(t => `${FLAGS[t]} ${t}`).join("  ·  ")}
+              </span>
+            </div>
+
+            {/* Ottelut */}
+            {ALL_MATCHES.filter(m => m.group===group).map(match => {
+              const mp = preds.matches?.[match.id] || {};
+              const s  = sign(mp.h, mp.a);
+              const done = mp.h!==undefined && mp.a!==undefined && mp.h!=="" && mp.a!=="";
+              return (
+                <div key={match.id} style={S.matchRow(done)}>
+                  <span style={{ fontSize:18, minWidth:22 }}>{FLAGS[match.home]}</span>
+                  <span style={{ flex:1, fontSize:13, textAlign:"right", color:"var(--color-text-primary)" }}>{match.home}</span>
+                  <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                    <input type="number" min="0" max="20" step="1" aria-label={`${match.home} maalit`} style={S.scoreInput} value={mp.h??""} onChange={e => updateMatch(match.id,"h",e.target.value)}/>
+                    <div style={S.signBadge(s)} aria-label={`Tulos: ${s||"–"}`}>{s||"–"}</div>
+                    <input type="number" min="0" max="20" step="1" aria-label={`${match.away} maalit`} style={S.scoreInput} value={mp.a??""} onChange={e => updateMatch(match.id,"a",e.target.value)}/>
+                  </div>
+                  <span style={{ flex:1, fontSize:13, color:"var(--color-text-primary)" }}>{match.away}</span>
+                  <span style={{ fontSize:18, minWidth:22, textAlign:"right" }}>{FLAGS[match.away]}</span>
+                </div>
+              );
+            })}
+
+            {/* Pisteohje */}
+            <div style={{ marginTop:14, padding:"10px 14px", background:"var(--color-background-secondary)", borderRadius:"var(--border-radius-md)", fontSize:12, color:"var(--color-text-secondary)" }}>
+              Tarkka tulos = <strong style={{ fontWeight:500, color:"var(--color-text-success)" }}>4p</strong> &nbsp;·&nbsp; Oikea 1X2 = <strong style={{ fontWeight:500, color:"var(--color-text-primary)" }}>2p</strong>
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════
+            JATKOONPÄÄSY (32 joukkuetta)
+        ════════════════════════════════════════════ */}
+        {tab==="jatko" && (
+          <div>
+            <p style={{ fontSize:13, color:"var(--color-text-secondary)", marginBottom:4, lineHeight:1.6 }}>
+              Valitse <strong style={{ fontWeight:500, color:"var(--color-text-primary)" }}>32 joukkuetta</strong> jotka pääsevät lohkovaiheen läpi — top 2 per lohko + 8 parasta kolmossijoittujaa.
+            </p>
+            <div style={S.secTitle}>
+              Valittuna
+              <span style={S.badge(preds.advancement.length===32)}>{preds.advancement.length} / 32</span>
+              <span style={{ marginLeft:"auto", fontSize:11, color:"var(--color-text-tertiary)" }}>1p per oikea joukkue</span>
+            </div>
+            {Object.entries(GROUPS).map(([g, teams]) => (
+              <div key={g} style={{ marginBottom:14 }}>
+                <div style={{ fontSize:11, fontWeight:500, letterSpacing:"0.8px", color:"var(--color-text-tertiary)", textTransform:"uppercase", marginBottom:5 }}>Lohko {g}</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:5 }}>
+                  {teams.map(team => {
+                    const sel = preds.advancement.includes(team);
+                    const disabled = !sel && preds.advancement.length >= 32;
+                    return (
+                      <button key={team} style={{ ...S.chip(sel,false), opacity:disabled?0.35:1, cursor:disabled?"not-allowed":"pointer" }}
+                        onClick={() => !disabled && toggleList("advancement",team,32)} disabled={disabled}>
+                        <span>{FLAGS[team]}</span>
+                        <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{team}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════
+            PUDOTUSPELIT
+        ════════════════════════════════════════════ */}
+        {tab==="pudotus" && (
+          <div>
+            {[
+              { key:"r32", label:"Kahdeksasfinaalit → jatkajat", max:16, pts:"1p/joukkue" },
+              { key:"r16", label:"Kuudestoistafinaalit → jatkajat", max:8,  pts:"2p/joukkue" },
+              { key:"qf",  label:"Neljännesfinaalit → jatkajat", max:4,  pts:"3p/joukkue" },
+              { key:"sf",  label:"Puolifinaalit → Finalistit", max:2,  pts:"4p/joukkue" },
+            ].map(({ key, label, max, pts }) => (
+              <div key={key}>
+                <div style={S.secTitle}>
+                  {label}
+                  <span style={S.badge(preds[key].length===max)}>{preds[key].length} / {max}</span>
+                  <span style={{ marginLeft:"auto", fontSize:11, color:"var(--color-text-tertiary)" }}>{pts}</span>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:5, marginBottom:6 }}>
+                  {ALL_TEAMS.map(team => {
+                    const sel = preds[key].includes(team);
+                    const disabled = !sel && preds[key].length >= max;
+                    return (
+                      <button key={team} style={{ ...S.chip(sel,false), opacity:disabled?0.25:1, cursor:disabled?"not-allowed":"pointer" }}
+                        onClick={() => !disabled && toggleList(key,team,max)} disabled={disabled}>
+                        <span>{FLAGS[team]}</span>
+                        <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{team}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Mestari */}
+            <div style={{ marginTop:20, padding:"14px 16px", background:"var(--color-background-warning)", border:"0.5px solid var(--color-border-warning)", borderRadius:"var(--border-radius-lg)" }}>
+              <div style={S.secTitle}>
+                <i className="ti ti-trophy" style={{ fontSize:16 }} aria-hidden="true"></i>
+                Mestari
+                <span style={{ marginLeft:"auto", fontSize:11, color:"var(--color-text-tertiary)" }}>8p</span>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:5 }}>
+                {ALL_TEAMS.map(team => (
+                  <button key={team} style={S.chip(preds.champion===team, true)} onClick={() => setChamp(team)}>
+                    <span>{FLAGS[team]}</span>
+                    <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{team}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Pisteohje */}
+            <div style={{ marginTop:16, padding:"12px 16px", background:"var(--color-background-secondary)", borderRadius:"var(--border-radius-lg)", fontSize:12, color:"var(--color-text-secondary)", lineHeight:1.8 }}>
+              <strong style={{ fontWeight:500, color:"var(--color-text-primary)", display:"block", marginBottom:4 }}>Pisteytysjärjestelmä</strong>
+              Tarkka tulos: 4p · Oikea 1X2: 2p · Jatkoonpääsy: 1p/joukkue · R32 voittaja: 1p · R16 voittaja: 2p · QF voittaja: 3p · Finalisti: 4p · Mestari: 8p
+            </div>
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════
+            TULOSTAULU
+        ════════════════════════════════════════════ */}
+        {tab==="taulu" && (
+          <div>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+              <span style={{ fontSize:15, fontWeight:500 }}>Sijoitukset</span>
+              <button onClick={loadBoard} style={{ fontSize:12, padding:"6px 12px", border:"0.5px solid var(--color-border-secondary)", borderRadius:"var(--border-radius-md)", background:"none", cursor:"pointer", color:"var(--color-text-secondary)" }}>
+                <i className="ti ti-refresh" style={{ marginRight:4, fontSize:13, verticalAlign:"-1px" }} aria-hidden="true"></i>Päivitä
+              </button>
+            </div>
+            {boardLoad ? (
+              <div style={{ textAlign:"center", padding:40, color:"var(--color-text-tertiary)", fontSize:13 }}>Ladataan...</div>
+            ) : board.length===0 ? (
+              <div style={{ textAlign:"center", padding:40, color:"var(--color-text-tertiary)", fontSize:13 }}>Ei vielä veikkauksia tai tuloksia.</div>
+            ) : (
+              <div>
+                {board.map((entry, i) => (
+                  <div key={entry.uid} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", background:entry.uid===userId?"var(--color-background-success)":"var(--color-background-primary)", border:entry.uid===userId?"0.5px solid var(--color-border-success)":"0.5px solid var(--color-border-tertiary)", borderRadius:"var(--border-radius-lg)", marginBottom:5 }}>
+                    <span style={{ width:28, fontSize:16, textAlign:"center" }} aria-label={`Sija ${i+1}`}>
+                      {i===0?"🥇":i===1?"🥈":i===2?"🥉":<span style={{ fontSize:13, color:"var(--color-text-tertiary)" }}>{i+1}</span>}
+                    </span>
+                    <span style={{ flex:1, fontWeight:entry.uid===userId?500:400, fontSize:14 }}>
+                      {entry.name}
+                      {entry.uid===userId && <span style={{ fontSize:11, color:"var(--color-text-success)", marginLeft:6 }}>· sinä</span>}
+                    </span>
+                    <span style={{ fontSize:18, fontWeight:500 }}>{entry.score}</span>
+                    <span style={{ fontSize:11, color:"var(--color-text-tertiary)" }}>p</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ════════════════════════════════════════════
+            ADMIN PANEL
+        ════════════════════════════════════════════ */}
+        {tab==="admin" && (
+          !adminOpen ? (
+            <div style={{ maxWidth:300, margin:"40px auto", textAlign:"center" }}>
+              <i className="ti ti-lock" style={{ fontSize:32, color:"var(--color-text-tertiary)", display:"block", marginBottom:16 }} aria-hidden="true"></i>
+              <p style={{ fontSize:13, color:"var(--color-text-secondary)", marginBottom:20 }}>Syötä todellisia tuloksia — pisteet lasketaan automaattisesti kaikille.</p>
+              <input
+                type="password"
+                placeholder="Salasana"
+                value={adminPw}
+                onChange={e => setAdminPw(e.target.value)}
+                onKeyDown={e => e.key==="Enter" && adminPw===ADMIN_PW && setAdminOpen(true)}
+                style={{ width:"100%", marginBottom:10, padding:"10px 14px", background:"var(--color-background-secondary)", border:"0.5px solid var(--color-border-secondary)", borderRadius:"var(--border-radius-md)", fontSize:14, color:"var(--color-text-primary)", fontFamily:"var(--font-sans)" }}
+              />
+              <button onClick={() => adminPw===ADMIN_PW && setAdminOpen(true)} style={{ width:"100%", padding:10, background:"var(--color-text-primary)", color:"var(--color-background-primary)", border:"none", borderRadius:"var(--border-radius-md)", fontSize:14, fontWeight:500, cursor:"pointer" }}>
+                Avaa admin
+              </button>
+              {adminPw && adminPw!==ADMIN_PW && <p style={{ fontSize:12, color:"var(--color-text-danger)", marginTop:8 }}>Väärä salasana</p>}
+            </div>
+          ) : (
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16 }}>
+                <span style={{ fontSize:15, fontWeight:500 }}>Tulossyöttö</span>
+                <button
+                  onClick={async () => {
+                    setAdminSave(true);
+                    await fb.set("results", adminRes);
+                    setResults({ ...adminRes });
+                    setAdminSave(false);
+                  }}
+                  disabled={adminSave}
+                  style={{ padding:"8px 16px", background:"var(--color-text-primary)", color:"var(--color-background-primary)", border:"none", borderRadius:"var(--border-radius-md)", fontSize:13, fontWeight:500, cursor:"pointer", opacity:adminSave?0.5:1 }}>
+                  {adminSave ? "Tallennetaan..." : "Tallenna kaikki"}
+                </button>
+              </div>
+
+              {/* Lohkonapit */}
+              <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:14 }}>
+                {"ABCDEFGHIJKL".split("").map(g => (
+                  <button key={g} style={S.grpBtn(adminGrp===g)} onClick={() => setAdminGrp(g)}>{g}</button>
+                ))}
+              </div>
+
+              <div style={{ marginBottom:4, fontSize:12, color:"var(--color-text-tertiary)" }}>Lohko {adminGrp} — syötä tulokset</div>
+
+              {ALL_MATCHES.filter(m => m.group===adminGrp).map(match => {
+                const r = adminRes.matches?.[match.id] || {};
+                return (
+                  <div key={match.id} style={{ ...S.matchRow(false), marginBottom:4 }}>
+                    <span style={{ fontSize:15 }}>{FLAGS[match.home]}</span>
+                    <span style={{ flex:1, fontSize:13, textAlign:"right", color:"var(--color-text-primary)" }}>{match.home}</span>
+                    <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+                      <input type="number" min="0" max="20" step="1" style={{ ...S.scoreInput, width:40, height:36 }} value={r.h??""} onChange={e => setAdminRes(prev => ({ ...prev, matches:{ ...prev.matches, [match.id]:{ ...prev.matches?.[match.id], h:e.target.value } } }))} aria-label={`${match.home} maalit`}/>
+                      <span style={{ color:"var(--color-text-tertiary)", fontWeight:500, fontSize:14 }}>–</span>
+                      <input type="number" min="0" max="20" step="1" style={{ ...S.scoreInput, width:40, height:36 }} value={r.a??""} onChange={e => setAdminRes(prev => ({ ...prev, matches:{ ...prev.matches, [match.id]:{ ...prev.matches?.[match.id], a:e.target.value } } }))} aria-label={`${match.away} maalit`}/>
+                    </div>
+                    <span style={{ flex:1, fontSize:13, color:"var(--color-text-primary)" }}>{match.away}</span>
+                    <span style={{ fontSize:15 }}>{FLAGS[match.away]}</span>
+                  </div>
+                );
+              })}
+
+              {/* Jatkoonpääsy - todelliset */}
+              <AdminTeamPicker label="Todelliset jatkoonpääsijät" listKey="advancement" max={32} adminRes={adminRes} setAdminRes={setAdminRes} S={S} />
+
+              {/* Pudotuspelit - todelliset */}
+              {[
+                { key:"r32", label:"R32 voittajat", max:16 },
+                { key:"r16", label:"R16 voittajat", max:8 },
+                { key:"qf",  label:"QF voittajat", max:4 },
+                { key:"sf",  label:"Finalistit", max:2 },
+              ].map(({ key, label, max }) => (
+                <AdminTeamPicker key={key} label={label} listKey={key} max={max} adminRes={adminRes} setAdminRes={setAdminRes} S={S} />
+              ))}
+
+              {/* Mestari - todellinen */}
+              <div style={S.secTitle}>
+                <i className="ti ti-trophy" style={{ fontSize:16 }} aria-hidden="true"></i>Todellinen mestari
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:5 }}>
+                {ALL_TEAMS.map(team => (
+                  <button key={team} style={S.chip(adminRes.champion===team, true)}
+                    onClick={() => setAdminRes(prev => ({ ...prev, champion:prev.champion===team?"":team }))}>
+                    <span>{FLAGS[team]}</span>
+                    <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{team}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+// ── Admin-apukomponentti tiimivalinnalle ──────────────
+function AdminTeamPicker({ label, listKey, max, adminRes, setAdminRes, S }) {
+  const current = adminRes[listKey] || [];
+  return (
+    <div>
+      <div style={S.secTitle}>
+        {label}
+        <span style={S.badge(current.length===max)}>{current.length} / {max}</span>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))", gap:5, marginBottom:8 }}>
+        {ALL_TEAMS.map(team => {
+          const sel = current.includes(team);
+          const disabled = !sel && current.length >= max;
+          return (
+            <button key={team} style={{ ...S.chip(sel,false), opacity:disabled?0.25:1, cursor:disabled?"not-allowed":"pointer" }}
+              onClick={() => {
+                if (disabled) return;
+                const upd = sel ? current.filter(t=>t!==team) : [...current, team];
+                setAdminRes(prev => ({ ...prev, [listKey]:upd }));
+              }} disabled={disabled}>
+              <span>{FLAGS[team]}</span>
+              <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{team}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Storage polyfill for non-Claude environments
+if (typeof window.storage === 'undefined') {
+  const _store = {};
+  window.storage = {
+    get: async (k) => { if(_store[k]===undefined) throw new Error("not found"); return {value:_store[k]}; },
+    set: async (k,v) => { _store[k]=v; return {key:k,value:v}; },
+    delete: async (k) => { delete _store[k]; return {key:k,deleted:true}; }
+  };
+  // Try localStorage as persistent fallback
+  try {
+    const _ls = window.localStorage;
+    window.storage = {
+      get: async (k) => { const v=_ls.getItem(k); if(v===null) throw new Error("not found"); return {value:v}; },
+      set: async (k,v) => { _ls.setItem(k,String(v)); return {key:k,value:v}; },
+      delete: async (k) => { _ls.removeItem(k); return {key:k,deleted:true}; }
+    };
+  } catch(e) {}
+}
+
+const rootEl = document.getElementById('root');
+const root = ReactDOM.createRoot(rootEl);
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
