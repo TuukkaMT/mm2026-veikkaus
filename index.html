@@ -176,7 +176,7 @@ const GROUPS = {
   I:["Ranska","Senegal","Irak","Norja"],J:["Argentiina","Algeria","Itävalta","Jordania"],
   K:["Portugali","Kongo DR","Uzbekistan","Kolumbia"],L:["Englanti","Kroatia","Ghana","Panama"]
 };
-const FLAGS = {"Meksiko":"🇲🇽","Etelä-Afrikka":"🇿🇦","Etelä-Korea":"🇰🇷","Tšekki":"🇨🇿","Kanada":"🇨🇦","Bosnia-H.":"🇧🇦","Qatar":"🇶🇦","Sveitsi":"🇨🇭","Brasilia":"🇧🇷","Marokko":"🇲🇦","Haiti":"🇭🇹","Skotlanti":"🏴󠁧󠁢󠁳󠁣󠁴󠁿","USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷","Saksa":"🇩🇪","Curaçao":"🇨🇼","Norsunluurannikko":"🇨🇮","Ecuador":"🇪🇨","Alankomaat":"🇳🇱","Japani":"🇯🇵","Ruotsi":"🇸🇪","Tunisia":"🇹🇳","Belgia":"🇧🇪","Egypti":"🇪🇬","Iran":"🇮🇷","Uusi-Seelanti":"🇳🇿","Espanja":"🇪🇸","Kap Verde":"🇨🇻","Saudi-Arabia":"🇸🇦","Uruguay":"🇺🇾","Ranska":"🇫🇷","Senegal":"🇸🇳","Irak":"🇮🇶","Norja":"🇳🇴","Argentiina":"🇦🇷","Algeria":"🇩🇿","Itävalta":"🇦🇹","Jordania":"🇯🇴","Portugali":"🇵🇹","Kongo DR":"🇨🇩","Uzbekistan":"🇺🇿","Kolumbia":"🇨🇴","Englanti":"🏴󠁧󠁢󠁥󠁮󠁧󠁿","Kroatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦"};
+const FLAGS = {"Meksiko":"🇲🇽","Etelä-Afrikka":"🇿🇦","Etelä-Korea":"🇰🇷","Tšekki":"🇨🇿","Kanada":"🇨🇦","Bosnia-H.":"🇧🇦","Qatar":"🇶🇦","Sveitsi":"🇨🇭","Brasilia":"🇧🇷","Marokko":"🇲🇦","Haiti":"🇭🇹","Skotlanti":'<svg viewBox="0 0 30 20" width="20" height="14" style="display:inline-block;vertical-align:-2px;border-radius:2px;overflow:hidden"><rect width="30" height="20" fill="#0065BD"/><path d="M0,0 L30,20 M30,0 L0,20" stroke="#fff" stroke-width="3"/></svg>',"USA":"🇺🇸","Paraguay":"🇵🇾","Australia":"🇦🇺","Türkiye":"🇹🇷","Saksa":"🇩🇪","Curaçao":"🇨🇼","Norsunluurannikko":"🇨🇮","Ecuador":"🇪🇨","Alankomaat":"🇳🇱","Japani":"🇯🇵","Ruotsi":"🇸🇪","Tunisia":"🇹🇳","Belgia":"🇧🇪","Egypti":"🇪🇬","Iran":"🇮🇷","Uusi-Seelanti":"🇳🇿","Espanja":"🇪🇸","Kap Verde":"🇨🇻","Saudi-Arabia":"🇸🇦","Uruguay":"🇺🇾","Ranska":"🇫🇷","Senegal":"🇸🇳","Irak":"🇮🇶","Norja":"🇳🇴","Argentiina":"🇦🇷","Algeria":"🇩🇿","Itävalta":"🇦🇹","Jordania":"🇯🇴","Portugali":"🇵🇹","Kongo DR":"🇨🇩","Uzbekistan":"🇺🇿","Kolumbia":"🇨🇴","Englanti":'<svg viewBox="0 0 30 20" width="20" height="14" style="display:inline-block;vertical-align:-2px;border-radius:2px"><rect width="30" height="20" fill="#fff"/><rect x="12" width="6" height="20" fill="#CE1124"/><rect y="8" width="30" height="4" fill="#CE1124"/></svg>',"Kroatia":"🇭🇷","Ghana":"🇬🇭","Panama":"🇵🇦"};
 const TEAM_RANKS = {"Ranska":1,"Espanja":2,"Argentiina":3,"Englanti":4,"Portugali":5,"Brasilia":6,"Alankomaat":7,"Marokko":8,"Belgia":9,"Saksa":10,"Kroatia":11,"Kolumbia":13,"Senegal":14,"Meksiko":15,"USA":16,"Uruguay":17,"Japani":18,"Sveitsi":19,"Iran":20,"Etelä-Korea":22,"Itävalta":23,"Australia":24,"Ecuador":25,"Türkiye":28,"Kanada":30,"Norja":32,"Egypti":35,"Tunisia":37,"Algeria":38,"Tšekki":40,"Norsunluurannikko":41,"Panama":42,"Skotlanti":44,"Paraguay":47,"Qatar":49,"Etelä-Afrikka":53,"Saudi-Arabia":56,"Irak":58,"Uzbekistan":62,"Kongo DR":63,"Kap Verde":70,"Jordania":72,"Bosnia-H.":73,"Ghana":74,"Curaçao":82,"Haiti":88,"Uusi-Seelanti":91};
 
 const PLAYERS = [
@@ -921,10 +921,32 @@ window.setVeikkausSubtab = t => { state.veikkausSubtab=t; render(); };
 window.selectPlayer = uid => { state.selectedPlayerId=uid; render(); };
 window.doLogin = async () => {
   if(!state.nameInput.trim()) return;
-  const uid = `u_${Date.now()}`;
-  try{ await window.storage.set("wc26_uid",uid); await window.storage.set("wc26_name",state.nameInput.trim()); }catch{}
-  await fb.set(`predictions/${uid}`,{...EMPTY(),name:state.nameInput.trim()});
-  state.userId=uid; state.userName=state.nameInput.trim(); render();
+  const name = state.nameInput.trim();
+  // Tarkista löytyykö olemassa oleva käyttäjä samalla nimellä
+  const allPreds = await fb.get("predictions");
+  let existingUid = null;
+  if(allPreds){
+    for(const [uid, data] of Object.entries(allPreds)){
+      if(data.name && data.name.toLowerCase() === name.toLowerCase()){
+        existingUid = uid;
+        break;
+      }
+    }
+  }
+  if(existingUid){
+    // Jatka olemassa olevana käyttäjänä
+    try{ await window.storage.set("wc26_uid",existingUid); await window.storage.set("wc26_name",name); }catch{}
+    const data = await fb.get(`predictions/${existingUid}`);
+    if(data) state.preds = {...EMPTY(),...data};
+    state.userId = existingUid; state.userName = name;
+  } else {
+    // Luo uusi käyttäjä
+    const uid = `u_${Date.now()}`;
+    try{ await window.storage.set("wc26_uid",uid); await window.storage.set("wc26_name",name); }catch{}
+    await fb.set(`predictions/${uid}`,{...EMPTY(),name:name});
+    state.userId=uid; state.userName=name;
+  }
+  render();
 };
 window.updateMatch = (id,field,val) => {
   if(isLocked()) return;
