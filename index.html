@@ -540,59 +540,6 @@ function renderByPlayer() {
         <p style="font-size:11px;opacity:0.9;letter-spacing:1.5px;text-transform:uppercase">Veikkaukset</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-        <div style="background:var(--color-background-secondary);padding:12px;border-radius:var(--border-radius-lg)">
-          <div style="font-family:var(--font-sport);font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🏆 Mestari</div>
-          <div style="font-size:14px;font-weight:500">${selected.champion ? `${FLAGS[selected.champion]||""} ${selected.champion}` : '<span style="color:var(--color-text-tertiary)">—</span>'}</div>
-          ${selected.champion && champCount>0 ? `<div style="font-size:10px;color:var(--color-text-tertiary);margin-top:4px">${champCount}/${total} veikkasi näin${champCount>=total*0.6?' 👑':''}</div>` : ''}
-        </div>
-        <div style="background:var(--color-background-secondary);padding:12px;border-radius:var(--border-radius-lg)">
-          <div style="font-family:var(--font-sport);font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⚽ Maalipörssi</div>
-          ${(selected.topScorers||[]).map((p,i) => {
-            const m = ["🥇","🥈","🥉"][i];
-            if (!p) return `<div style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:2px">${m} —</div>`;
-            const goals = selected.topScorerGoals?.[i];
-            const cons = tsCounts[i][p] || 0;
-            return `<div style="font-size:12px;margin-bottom:2px"><span style="color:var(--color-text-tertiary)">${m}</span> ${p}${goals?` <strong style="color:var(--gold)">${goals}m</strong>`:''} ${cons>1?`<span style="color:var(--color-text-tertiary);font-size:10px">(${cons}/${total})</span>`:''}</div>`;
-          }).join('')}
-        </div>
-      </div>
-
-      ${[
-        {key:"r32",label:"Kahdeksasfinaalit (R32)",max:16},
-        {key:"r16",label:"Kuudestoistafinaalit (R16)",max:8},
-        {key:"qf",label:"Neljännesfinaalit (QF)",max:4},
-        {key:"sf",label:"Finalistit",max:2}
-      ].map(({key,label,max}) => {
-        const teams = selected[key] || [];
-        const counts = countPicksInList(key);
-        return `
-          <div class="sec-title">${label} <span class="badge">${teams.length}/${max}</span></div>
-          <div class="team-grid" style="margin-bottom:14px">
-            ${teams.length===0?`<div style="font-size:12px;color:var(--color-text-tertiary);grid-column:1/-1;padding:10px">Ei valintoja</div>`:teams.map(team => {
-              const c = counts[team] || 0;
-              const isCons = c >= total * 0.6;
-              return `<div class="chip-base${isCons?' chip-consensus':''}" style="cursor:default">
-                <span>${FLAGS[team]}</span><span class="team-text">${team}</span>
-                <span class="rank-tag">${c}/${total}${isCons?' 👑':''}</span>
-              </div>`;
-            }).join('')}
-          </div>
-        `;
-      }).join('')}
-
-      <div class="sec-title">Jatkoonpääsy <span class="badge">${(selected.advancement||[]).length}/32</span></div>
-      <div class="team-grid" style="margin-bottom:14px">
-        ${(selected.advancement||[]).length===0?`<div style="font-size:12px;color:var(--color-text-tertiary);grid-column:1/-1;padding:10px">Ei valintoja</div>`:(selected.advancement||[]).map(team => {
-          const c = advCounts[team] || 0;
-          const isCons = c >= total * 0.6;
-          return `<div class="chip-base${isCons?' chip-consensus':''}" style="cursor:default">
-            <span>${FLAGS[team]}</span><span class="team-text">${team}</span>
-            <span class="rank-tag">${c}/${total}${isCons?' 👑':''}</span>
-          </div>`;
-        }).join('')}
-      </div>
-
       <div class="sec-title">Otteluveikkaukset</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
         ${"ABCDEFGHIJKL".split("").map(g=>`<button onclick="setGroup('${g}')" class="grp-btn${s.group===g?' active':''}">${g}</button>`).join("")}
@@ -622,6 +569,65 @@ function renderByPlayer() {
           ` : ''}
         `;
       }).join('')}
+
+      <div class="sec-title">Jatkoonpääsy <span class="badge">${(selected.advancement||[]).length}/32</span></div>
+      <div class="team-grid" style="margin-bottom:14px">
+        ${(selected.advancement||[]).length===0?`<div style="font-size:12px;color:var(--color-text-tertiary);grid-column:1/-1;padding:10px">Ei valintoja</div>`:(selected.advancement||[]).map(team => {
+          const c = advCounts[team] || 0;
+          const isCons = c >= total * 0.6;
+          return `<div class="chip-base${isCons?' chip-consensus':''}" style="cursor:default">
+            <span>${FLAGS[team]}</span><span class="team-text">${team}</span>
+            <span class="rank-tag">${c}/${total}${isCons?' 👑':''}</span>
+          </div>`;
+        }).join('')}
+      </div>
+
+      ${[
+        {key:"r32",label:"Kahdeksasfinaalit (R32)",max:16},
+        {key:"r16",label:"Kuudestoistafinaalit (R16)",max:8},
+        {key:"qf",label:"Neljännesfinaalit (QF)",max:4},
+        {key:"sf",label:"Finalistit",max:2}
+      ].map(({key,label,max}) => {
+        const teams = selected[key] || [];
+        const counts = countPicksInList(key);
+        return `
+          <div class="sec-title">${label} <span class="badge">${teams.length}/${max}</span></div>
+          <div class="team-grid" style="margin-bottom:14px">
+            ${teams.length===0?`<div style="font-size:12px;color:var(--color-text-tertiary);grid-column:1/-1;padding:10px">Ei valintoja</div>`:teams.map(team => {
+              const c = counts[team] || 0;
+              const isCons = c >= total * 0.6;
+              return `<div class="chip-base${isCons?' chip-consensus':''}" style="cursor:default">
+                <span>${FLAGS[team]}</span><span class="team-text">${team}</span>
+                <span class="rank-tag">${c}/${total}${isCons?' 👑':''}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        `;
+      }).join('')}
+
+      <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(244,196,48,0.1) 0%,rgba(244,196,48,0.02) 100%);border:1px solid var(--color-border-warning);border-radius:var(--border-radius-lg)">
+        <div class="sec-title" style="margin-top:0"><i class="ti ti-trophy" style="font-size:16px;color:var(--gold)"></i>MESTARI</div>
+        <div style="font-size:18px;font-weight:600;font-family:var(--font-sport);letter-spacing:1px">${selected.champion ? `${FLAGS[selected.champion]||""} ${selected.champion}` : '<span style="color:var(--color-text-tertiary);font-size:14px">— ei valittu —</span>'}</div>
+        ${selected.champion && champCount>0 ? `<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:6px">${champCount}/${total} veikkasi näin${champCount>=total*0.6?' 👑 konsensus':''}</div>` : ''}
+      </div>
+
+      <div style="margin-top:14px;padding:16px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg)">
+        <div class="sec-title" style="margin-top:0"><i class="ti ti-soccer-field" style="font-size:16px;color:var(--pitch-green)"></i>MAALIPÖRSSI · TOP 3</div>
+        ${(selected.topScorers||[]).map((p,i) => {
+          const m = ["🥇","🥈","🥉"][i];
+          if (!p) return `<div style="font-size:13px;color:var(--color-text-tertiary);margin-bottom:6px;padding:8px 12px;background:var(--color-background-primary);border-radius:var(--border-radius-md)">${m} <span style="margin-left:6px">— ei valittu —</span></div>`;
+          const goals = selected.topScorerGoals?.[i];
+          const cons = tsCounts[i][p] || 0;
+          const playerData = PLAYERS.find(pl => pl.n === p);
+          return `<div style="font-size:13px;margin-bottom:6px;padding:10px 12px;background:var(--color-background-primary);border-radius:var(--border-radius-md);display:flex;align-items:center;gap:8px">
+            <span style="font-size:18px">${m}</span>
+            <span style="font-size:16px">${playerData?FLAGS[playerData.c]:""}</span>
+            <span style="flex:1;font-weight:500">${p}</span>
+            ${goals?`<span class="score-display" style="padding:3px 8px;font-size:13px">${goals} m</span>`:''}
+            ${cons>1?`<span style="font-size:10px;color:var(--color-text-tertiary)">${cons}/${total}${cons>=total*0.4?' 👑':''}</span>`:''}
+          </div>`;
+        }).join('')}
+      </div>
     </div>
   `;
 }
