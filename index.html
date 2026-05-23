@@ -154,6 +154,7 @@
     .pop-bar{background:var(--color-background-tertiary);width:60px;height:6px;border-radius:3px;overflow:hidden}
     .pop-bar-fill{height:100%;background:var(--pitch-green)}
     .pop-bar-fill.gold{background:var(--gold)}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(46,125,50,0.5)}50%{box-shadow:0 0 0 8px rgba(46,125,50,0)}}
   </style>
 </head>
 <body>
@@ -186,7 +187,7 @@ const PLAYERS = [
 const ALL_MATCHES = [];
 Object.entries(GROUPS).forEach(([g,teams])=>{let n=1;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)ALL_MATCHES.push({id:`${g}${n++}`,group:g,home:teams[i],away:teams[j]})});
 const ALL_TEAMS = Object.values(GROUPS).flat();
-const EMPTY = ()=>({matches:{},advancement:[],r32:[],r16:[],qf:[],sf:[],champion:"",topScorers:["","",""],topScorerGoals:["","",""]});
+const EMPTY = ()=>({matches:{},advancement:[],r32:[],r16:[],qf:[],sf:[],champion:"",bronzeWinner:"",topScorers:["","",""],topScorerGoals:["","",""]});
 const { useState, useEffect, useRef, useCallback } = React;
 
 let state = {
@@ -216,12 +217,14 @@ const sign = (h,a) => { if(h===""||a===""||h===undefined||a===undefined) return 
 
 const calcScore = (p,r) => {
   if(!p||!r) return 0; let s=0;
-  ALL_MATCHES.forEach(({id})=>{const pm=p.matches?.[id],rm=r.matches?.[id];if(!pm||!rm||rm.h===undefined)return;if(+pm.h===+rm.h&&+pm.a===+rm.a)s+=4;else if(sign(pm.h,pm.a)===sign(rm.h,rm.a))s+=2;});
-  const ra=new Set(r.advancement||[]);(p.advancement||[]).forEach(t=>ra.has(t)&&s++);
-  [["r32",1],["r16",2],["qf",3],["sf",4]].forEach(([rnd,pts])=>{const rs=new Set(r[rnd]||[]);(p[rnd]||[]).forEach(t=>rs.has(t)&&(s+=pts));});
-  if(p.champion&&p.champion===r.champion)s+=8;
+  ALL_MATCHES.forEach(({id})=>{const pm=p.matches?.[id],rm=r.matches?.[id];if(!pm||!rm||rm.h===undefined)return;if(+pm.h===+rm.h&&+pm.a===+rm.a)s+=5;else if(sign(pm.h,pm.a)===sign(rm.h,rm.a))s+=2;});
+  const ra=new Set(r.advancement||[]);(p.advancement||[]).forEach(t=>ra.has(t)&&(s+=2));
+  [["r32",4],["r16",6],["qf",8],["sf",10]].forEach(([rnd,pts])=>{const rs=new Set(r[rnd]||[]);(p[rnd]||[]).forEach(t=>rs.has(t)&&(s+=pts));});
+  if(p.bronzeWinner&&p.bronzeWinner===r.bronzeWinner)s+=8;
+  if(p.champion&&p.champion===r.champion)s+=12;
   if(p.topScorers&&r.topScorers){
     const posPts=[8,4,2];
+    const goalPts=[5,3,1];
     [0,1,2].forEach(i=>{
       const player = p.topScorers[i]; if(!player) return;
       let playerInTop3 = false;
@@ -232,7 +235,7 @@ const calcScore = (p,r) => {
         const actualGoals = r.topScorerGoals?.[actualIdx];
         if(actualGoals!==""&&actualGoals!==null&&actualGoals!==undefined){
           const diff = Math.abs(+p.topScorerGoals[i] - +actualGoals);
-          if(diff===0) s+=3; else if(diff===1) s+=1;
+          if(diff===0) s+=goalPts[i]; else if(diff===1) s+=1;
         }
       }
     });
@@ -262,6 +265,11 @@ const countPicksInList = (key) => {
 const countChampionPicks = () => {
   const counts = {};
   state.allPreds.forEach(p => { if(p.champion) counts[p.champion]=(counts[p.champion]||0)+1; });
+  return counts;
+};
+const countBronzePicks = () => {
+  const counts = {};
+  state.allPreds.forEach(p => { if(p.bronzeWinner) counts[p.bronzeWinner]=(counts[p.bronzeWinner]||0)+1; });
   return counts;
 };
 const countTopScorerPicks = (idx) => {
@@ -388,7 +396,7 @@ function renderLohko(matchesDone, locked) {
         </div>`;
       }).join("")}
       <div style="margin-top:14px;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px;color:var(--color-text-secondary);line-height:1.7">
-        <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Tarkka tulos = 4p</strong> &nbsp;·&nbsp; <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Oikea 1X2 = 2p</strong>
+        <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Tarkka tulos = 5p</strong> &nbsp;·&nbsp; <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Oikea 1X2 = 2p</strong>
         <br><span style="font-size:11px;color:var(--color-text-tertiary)">⭐ FIFA top 4 · #N = sijoitus FIFA-listalla</span>
       </div>
     </div>
@@ -403,7 +411,7 @@ function renderJatko(locked) {
       <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px;line-height:1.6">
         Valitse <strong style="font-weight:600;color:var(--color-text-primary)">32 joukkuetta</strong> jotka pääsevät jatkoon — top 2 per lohko + 8 parasta kolmossijoittujaa.
       </p>
-      <div class="sec-title">Valittuna <span class="badge${n===32?" ok":""}">${n} / 32</span> <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">1p / oikea joukkue</span></div>
+      <div class="sec-title">Valittuna <span class="badge${n===32?" ok":""}">${n} / 32</span> <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">2p / oikea joukkue</span></div>
       ${Object.entries(GROUPS).map(([g,teams])=>`
         <div style="margin-bottom:14px">
           <div style="font-family:var(--font-sport);font-size:12px;font-weight:600;letter-spacing:1.5px;color:var(--color-text-tertiary);text-transform:uppercase;margin-bottom:6px">Lohko ${g}</div>
@@ -421,15 +429,16 @@ function renderJatko(locked) {
 function renderPudotus(locked) {
   const s = state;
   const rounds = [
-    {key:"r32",label:"Kahdeksasfinaalit",max:16,pts:"1p/joukkue"},
-    {key:"r16",label:"Kuudestoistafinaalit",max:8,pts:"2p/joukkue"},
-    {key:"qf",label:"Neljännesfinaalit",max:4,pts:"3p/joukkue"},
-    {key:"sf",label:"Puolifinaalit — Finalistit",max:2,pts:"4p/joukkue"},
+    {key:"r32",label:"Kahdeksasfinaalit",max:16,pts:"4p/joukkue"},
+    {key:"r16",label:"Kuudestoistafinaalit",max:8,pts:"6p/joukkue"},
+    {key:"qf",label:"Neljännesfinaalit",max:4,pts:"8p/joukkue"},
+    {key:"sf",label:"Puolifinaalit — Finalistit",max:2,pts:"10p/joukkue"},
   ];
   const ts = s.preds.topScorers || ["","",""];
   const tg = s.preds.topScorerGoals || ["","",""];
   const medals = ["🥇","🥈","🥉"];
   const tsPoints = [8,4,2];
+  const goalPoints = [5,3,1];
   return `
     <div>
       ${rounds.map(({key,label,max,pts})=>{
@@ -444,17 +453,23 @@ function renderPudotus(locked) {
         </div>`;
       }).join("")}
 
+      <div style="margin-top:24px;padding:16px;background:linear-gradient(135deg,rgba(205,127,50,0.1) 0%,rgba(205,127,50,0.02) 100%);border:1px solid #cd7f32;border-radius:var(--border-radius-lg)">
+        <div class="sec-title" style="margin-top:0"><span style="font-size:18px">🥉</span>PRONSSIOTTELUN VOITTAJA <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">8p</span></div>
+        <p style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:10px;line-height:1.5">Pronssiottelussa kohtaavat puolivälierien häviäjät. Veikkaa kuka voittaa MM-pronssin.</p>
+        <div class="team-grid">${ALL_TEAMS.map(team=>`<button class="chip-base${state.preds.bronzeWinner===team?" chip-sel-w":""}" style="${state.preds.bronzeWinner===team?'background:linear-gradient(135deg,#cd7f32 0%,#8b4513 100%)!important;border-color:#8b4513!important;color:#fff!important;font-weight:600':''}" onclick="setBronzeWinner('${team.replace(/'/g,"\\\\'")}')" ${locked?"disabled style='opacity:.5'":""}><span>${FLAGS[team]}</span><span class="team-text">${team}${teamStar(team)?" ⭐":""}</span><span class="rank-tag">#${teamRank(team)}</span></button>`).join("")}</div>
+      </div>
+
       <div style="margin-top:24px;padding:16px;background:linear-gradient(135deg,rgba(244,196,48,0.08) 0%,rgba(244,196,48,0.02) 100%);border:1px solid var(--color-border-warning);border-radius:var(--border-radius-lg)">
-        <div class="sec-title" style="margin-top:0"><i class="ti ti-trophy" style="font-size:18px;color:var(--gold)"></i>MAAILMANMESTARI <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">8p</span></div>
+        <div class="sec-title" style="margin-top:0"><i class="ti ti-trophy" style="font-size:18px;color:var(--gold)"></i>MAAILMANMESTARI <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">12p</span></div>
         <div class="team-grid">${ALL_TEAMS.map(team=>`<button class="chip-base${state.preds.champion===team?" chip-sel-w":""}" onclick="setChamp('${team.replace(/'/g,"\\\\'")}')" ${locked?"disabled style='opacity:.5'":""}><span>${FLAGS[team]}</span><span class="team-text">${team}${teamStar(team)?" ⭐":""}</span><span class="rank-tag">#${teamRank(team)}</span></button>`).join("")}</div>
       </div>
 
       <div style="margin-top:24px;padding:18px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg)">
         <div class="sec-title" style="margin-top:0"><i class="ti ti-soccer-field" style="font-size:18px;color:var(--pitch-green)"></i>MAALIPÖRSSI · TOP 3 <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">max 23p</span></div>
-        <p style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:12px;line-height:1.5">Veikkaa kuka tekee eniten maaleja ja kuinka monta. <strong style="color:var(--color-text-secondary)">Sija oikein:</strong> 8/4/2p · <strong style="color:var(--color-text-secondary)">Sija väärin mutta top 3:ssa:</strong> 1p · <strong style="color:var(--color-text-secondary)">Maalimäärä:</strong> tarkka +3p, ±1 +1p</p>
+        <p style="font-size:12px;color:var(--color-text-tertiary);margin-bottom:12px;line-height:1.5">Veikkaa kuka tekee eniten maaleja ja kuinka monta. <strong style="color:var(--color-text-secondary)">Sija oikein:</strong> 8/4/2p · <strong style="color:var(--color-text-secondary)">Sija väärin mutta top 3:ssa:</strong> 1p · <strong style="color:var(--color-text-secondary)">Maalimäärä tarkka:</strong> 5/3/1p · <strong style="color:var(--color-text-secondary)">±1 maali:</strong> 1p</p>
         ${[0,1,2].map(i=>`
           <div class="ts-card medal-${i+1}">
-            <div class="ts-label"><span class="ts-medal">${medals[i]}</span> ${i+1}. sija <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-sans);letter-spacing:0;text-transform:none">${tsPoints[i]}p sija + max 3p maalit</span></div>
+            <div class="ts-label"><span class="ts-medal">${medals[i]}</span> ${i+1}. sija <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary);font-family:var(--font-sans);letter-spacing:0;text-transform:none">${tsPoints[i]}p sija + max ${goalPoints[i]}p maalit</span></div>
             <div class="ts-row">
               <select class="ts-select" onchange="setTopScorer(${i}, this.value)" ${locked?"disabled":""}>
                 <option value="">— valitse pelaaja —</option>
@@ -468,7 +483,7 @@ function renderPudotus(locked) {
 
       <div style="margin-top:20px;padding:14px 16px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);font-size:12px;color:var(--color-text-secondary);line-height:1.8">
         <div style="font-family:var(--font-sport);font-weight:600;color:var(--color-text-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-size:13px"><i class="ti ti-info-circle" style="margin-right:4px"></i>Pisteytys</div>
-        Tarkka tulos: 4p &middot; Oikea 1X2: 2p &middot; Jatkoonpääsy: 1p &middot; R32/R16/QF/SF: 1/2/3/4p &middot; Mestari: 8p &middot; Maalipörssi: 8/4/2p + 3p tarkka maalimäärä
+        Tarkka tulos: 5p &middot; Oikea 1X2: 2p &middot; Jatkoonpääsy: 2p &middot; R32/R16/QF/SF: 4/6/8/10p &middot; 🥉 Pronssi: 8p &middot; 🏆 Mestari: 12p &middot; Maalipörssi: 8/4/2p + tarkka maalimäärä 5/3/1p
       </div>
     </div>
   `;
@@ -605,7 +620,13 @@ function renderByPlayer() {
         `;
       }).join('')}
 
-      <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(244,196,48,0.1) 0%,rgba(244,196,48,0.02) 100%);border:1px solid var(--color-border-warning);border-radius:var(--border-radius-lg)">
+      <div style="margin-top:20px;padding:16px;background:linear-gradient(135deg,rgba(205,127,50,0.1) 0%,rgba(205,127,50,0.02) 100%);border:1px solid #cd7f32;border-radius:var(--border-radius-lg)">
+        <div class="sec-title" style="margin-top:0"><span style="font-size:16px">🥉</span>PRONSSIOTTELUN VOITTAJA</div>
+        <div style="font-size:16px;font-weight:600;font-family:var(--font-sport);letter-spacing:1px">${selected.bronzeWinner ? `${FLAGS[selected.bronzeWinner]||""} ${selected.bronzeWinner}` : '<span style="color:var(--color-text-tertiary);font-size:14px">— ei valittu —</span>'}</div>
+        ${selected.bronzeWinner ? (() => { const bc=countBronzePicks(); const bn=bc[selected.bronzeWinner]||0; return bn>0?`<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:6px">${bn}/${total} veikkasi näin${bn>=total*0.4?' 👑 konsensus':''}</div>`:''; })() : ''}
+      </div>
+
+      <div style="margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(244,196,48,0.1) 0%,rgba(244,196,48,0.02) 100%);border:1px solid var(--color-border-warning);border-radius:var(--border-radius-lg)">
         <div class="sec-title" style="margin-top:0"><i class="ti ti-trophy" style="font-size:16px;color:var(--gold)"></i>MESTARI</div>
         <div style="font-size:18px;font-weight:600;font-family:var(--font-sport);letter-spacing:1px">${selected.champion ? `${FLAGS[selected.champion]||""} ${selected.champion}` : '<span style="color:var(--color-text-tertiary);font-size:14px">— ei valittu —</span>'}</div>
         ${selected.champion && champCount>0 ? `<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:6px">${champCount}/${total} veikkasi näin${champCount>=total*0.6?' 👑 konsensus':''}</div>` : ''}
@@ -637,11 +658,12 @@ function renderByMatch() {
   return `
     <div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px">
-        ${[["ottelut","Ottelut"],["jatko","Jatkoon"],["r32","R32"],["r16","R16"],["qf","QF"],["sf","Finalistit"],["mestari","Mestari"],["maalit","Maalipörssi"]].map(([k,l])=>`
+        ${[["ottelut","Ottelut"],["jatko","Jatkoon"],["r32","R32"],["r16","R16"],["qf","QF"],["sf","Finalistit"],["pronssi","Pronssi"],["mestari","Mestari"],["maalit","Maalipörssi"]].map(([k,l])=>`
           <button onclick="state.veikkausSection='${k}';render()" class="subtab-btn ${s.veikkausSection===k?'active':''}">${l}</button>
         `).join('')}
       </div>
       ${s.veikkausSection === 'ottelut' ? renderByMatchOttelut() :
+        s.veikkausSection === 'pronssi' ? renderByMatchBronze() :
         s.veikkausSection === 'mestari' ? renderByMatchMestari() :
         s.veikkausSection === 'maalit' ? renderByMatchMaalit() :
         renderByMatchTeamList(s.veikkausSection)}
@@ -766,6 +788,38 @@ function renderByMatchMestari() {
   `;
 }
 
+function renderByMatchBronze() {
+  const s = state;
+  const counts = {};
+  s.allPreds.forEach(p => { if (p.bronzeWinner) { if (!counts[p.bronzeWinner]) counts[p.bronzeWinner] = []; counts[p.bronzeWinner].push({name: p.name, uid: p.uid}); } });
+  const sorted = Object.entries(counts).sort((a,b)=>b[1].length-a[1].length);
+  const total = s.allPreds.length;
+  return `
+    <div>
+      <div style="margin-bottom:14px;padding:10px 14px;background:linear-gradient(135deg,rgba(205,127,50,0.1) 0%,rgba(205,127,50,0.02) 100%);border-radius:var(--border-radius-md);border-left:3px solid #cd7f32">
+        <div style="font-family:var(--font-sport);font-size:14px;font-weight:600;letter-spacing:0.5px">🥉 PRONSSIOTTELUN VOITTAJAT</div>
+      </div>
+      ${sorted.length === 0 ? `<p style="text-align:center;color:var(--color-text-tertiary);padding:20px;font-size:13px">Ei valintoja vielä</p>` :
+        sorted.map(([team, picks]) => {
+          const pct = Math.round((picks.length / total) * 100);
+          const isCons = pct >= 40;
+          const userPicked = picks.some(p => p.uid === s.userId);
+          return `
+            <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);margin-bottom:5px;${isCons?'border-left:3px solid #cd7f32':userPicked?'border-left:3px solid var(--pitch-green)':''}">
+              <span style="font-size:24px">${FLAGS[team]||""}</span>
+              <div style="flex:1">
+                <div style="font-size:14px;font-weight:500">${team}${isCons?' 👑':''}${userPicked?' <span style="font-size:10px;color:var(--pitch-green);margin-left:4px">· sinun valintasi</span>':''}</div>
+                <div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px">${picks.map(p => p.uid===s.userId?`<strong style="color:var(--pitch-green)">${p.name}</strong>`:p.name).join(", ")}</div>
+              </div>
+              <span class="lb-score">${picks.length}</span>
+            </div>
+          `;
+        }).join('')
+      }
+    </div>
+  `;
+}
+
 function renderByMatchMaalit() {
   const s = state;
   const medals = ["🥇","🥈","🥉"];
@@ -833,12 +887,65 @@ function renderAdmin() {
   const ts = s.adminRes.topScorers || ["","",""];
   const tg = s.adminRes.topScorerGoals || ["","",""];
   const medals = ["🥇","🥈","🥉"];
+
+  // Tila-laskenta
+  const matchesEntered = ALL_MATCHES.filter(m => {
+    const r = s.adminRes.matches?.[m.id];
+    return r && r.h !== undefined && r.h !== "" && r.a !== undefined && r.a !== "";
+  }).length;
+  const advCount = (s.adminRes.advancement || []).length;
+  const r32Count = (s.adminRes.r32 || []).length;
+  const r16Count = (s.adminRes.r16 || []).length;
+  const qfCount = (s.adminRes.qf || []).length;
+  const sfCount = (s.adminRes.sf || []).length;
+  const hasChamp = !!s.adminRes.champion;
+  const hasBronze = !!s.adminRes.bronzeWinner;
+  const tsCount = (s.adminRes.topScorers || []).filter(p => p).length;
+  const tsgCount = (s.adminRes.topScorerGoals || []).filter(g => g !== "" && g !== undefined && g !== null).length;
+  const statusItems = [
+    {label:"⚽ Ottelut", count:matchesEntered, total:72},
+    {label:"📋 Jatkoon", count:advCount, total:32},
+    {label:"R32 voittajat", count:r32Count, total:16},
+    {label:"R16 voittajat", count:r16Count, total:8},
+    {label:"QF voittajat", count:qfCount, total:4},
+    {label:"Finalistit", count:sfCount, total:2},
+    {label:"🥉 Pronssin voittaja", count:hasBronze?1:0, total:1},
+    {label:"🏆 Mestari", count:hasChamp?1:0, total:1},
+    {label:"⚽ Maalipörssi", count:tsCount, total:3},
+    {label:"Maalimäärät", count:tsgCount, total:3},
+  ];
+  const completedSections = statusItems.filter(i => i.count === i.total).length;
+  const totalSections = statusItems.length;
+
+  // Tallentamattomat muutokset
+  const hasUnsaved = JSON.stringify(s.adminRes) !== JSON.stringify({...EMPTY(), ...s.results});
+
   return `
     <div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div class="sec-title" style="margin:0">TULOSSYÖTTÖ</div>
-        <button onclick="adminSaveAll()" ${s.adminSaving?"disabled":""} class="btn-primary" style="padding:9px 16px">${s.adminSaving?"Tallennetaan...":"💾 Tallenna kaikki"}</button>
+        <button onclick="adminSaveAll()" ${s.adminSaving?"disabled":""} class="btn-primary" style="padding:9px 16px;${hasUnsaved?'animation:pulse 1.5s ease-in-out infinite':''}">${s.adminSaving?"Tallennetaan...":hasUnsaved?"💾 Tallenna muutokset":"✓ Tallennettu"}</button>
       </div>
+
+      ${hasUnsaved ? `
+        <div style="margin-bottom:14px;padding:12px 16px;background:var(--color-background-warning);border:1px solid var(--color-border-warning);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-warning);display:flex;align-items:center;gap:10px">
+          <i class="ti ti-alert-circle" style="font-size:18px;flex-shrink:0"></i>
+          <span><strong>Tallentamattomia muutoksia</strong> — muista klikata "Tallenna muutokset" yläpuolella, muuten ne katoavat kun suljet sivun.</span>
+        </div>
+      ` : ''}
+
+      <div class="sec-title">Täyttötila <span class="badge${completedSections===totalSections?' ok':''}">${completedSections}/${totalSections} valmiina</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:20px">
+        ${statusItems.map(({label,count,total}) => {
+          const complete = count === total;
+          const partial = count > 0 && !complete;
+          return `<div style="padding:9px 12px;background:${complete?'var(--color-background-success)':partial?'var(--color-background-secondary)':'var(--color-background-tertiary)'};border:1px solid ${complete?'var(--color-border-success)':'var(--color-border-tertiary)'};border-radius:var(--border-radius-md);font-size:12px;display:flex;justify-content:space-between;align-items:center;color:${complete?'var(--color-text-success)':partial?'var(--color-text-primary)':'var(--color-text-tertiary)'}">
+            <span>${label}</span>
+            <strong style="font-weight:600;font-family:var(--font-sport)">${count}/${total}${complete?' ✓':''}</strong>
+          </div>`;
+        }).join('')}
+      </div>
+
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
         ${"ABCDEFGHIJKL".split("").map(g=>`<button onclick="setAdminGrp('${g}')" class="grp-btn${s.adminGrp===g?" active":""}">${g}</button>`).join("")}
       </div>
@@ -866,6 +973,9 @@ function renderAdmin() {
           return `<button class="chip-base${sel?" chip-sel-s":""}" onclick="adminToggle('${key}','${team.replace(/'/g,"\\\\'")}',${max})" ${disabled?"disabled style='opacity:.25'":""}><span>${FLAGS[team]}</span><span class="team-text">${team}</span></button>`;
         }).join("")}</div>`;
       }).join("")}
+      <div class="sec-title"><span style="font-size:16px">🥉</span>TODELLINEN PRONSSIN VOITTAJA</div>
+      <div class="team-grid">${ALL_TEAMS.map(team=>`<button class="chip-base${state.adminRes.bronzeWinner===team?" chip-sel-w":""}" style="${state.adminRes.bronzeWinner===team?'background:linear-gradient(135deg,#cd7f32 0%,#8b4513 100%)!important;border-color:#8b4513!important;color:#fff!important;font-weight:600':''}" onclick="adminSetBronzeWinner('${team.replace(/'/g,"\\\\'")}')"><span>${FLAGS[team]}</span><span class="team-text">${team}</span></button>`).join("")}</div>
+
       <div class="sec-title"><i class="ti ti-trophy" style="font-size:16px;color:var(--gold)"></i>TODELLINEN MESTARI</div>
       <div class="team-grid">${ALL_TEAMS.map(team=>`<button class="chip-base${state.adminRes.champion===team?" chip-sel-w":""}" onclick="adminSetChamp('${team.replace(/'/g,"\\\\'")}')"><span>${FLAGS[team]}</span><span class="team-text">${team}</span></button>`).join("")}</div>
       <div class="sec-title"><i class="ti ti-soccer-field" style="font-size:16px;color:var(--pitch-green)"></i>MAALIPÖRSSI · TODELLISET TOP 3</div>
@@ -970,6 +1080,11 @@ window.setChamp = team => {
   const np={...state.preds,champion:state.preds.champion===team?"":team};
   state.preds=np; render(); scheduleSave(np);
 };
+window.setBronzeWinner = team => {
+  if(isLocked()) return;
+  const np={...state.preds,bronzeWinner:state.preds.bronzeWinner===team?"":team};
+  state.preds=np; render(); scheduleSave(np);
+};
 window.setTopScorer = (idx, player) => {
   if(isLocked()) return;
   const ts=[...(state.preds.topScorers||["","",""])]; ts[idx]=player;
@@ -1000,6 +1115,7 @@ window.tryAdminOpen = () => { if(state.adminPw===ADMIN_PW){state.adminOpen=true;
 window.adminUpdateMatch = (id,field,val) => { state.adminRes={...state.adminRes,matches:{...state.adminRes.matches,[id]:{...state.adminRes.matches?.[id],[field]:val}}}; render(); };
 window.adminToggle = (key,team,max) => { const cur=state.adminRes[key]||[]; const sel=cur.includes(team); if(!sel&&cur.length>=max) return; state.adminRes={...state.adminRes,[key]:sel?cur.filter(t=>t!==team):[...cur,team]}; render(); };
 window.adminSetChamp = team => { state.adminRes={...state.adminRes,champion:state.adminRes.champion===team?"":team}; render(); };
+window.adminSetBronzeWinner = team => { state.adminRes={...state.adminRes,bronzeWinner:state.adminRes.bronzeWinner===team?"":team}; render(); };
 window.adminSetTopScorer = (idx, player) => { const ts=[...(state.adminRes.topScorers||["","",""])]; ts[idx]=player; state.adminRes={...state.adminRes, topScorers: ts}; render(); };
 window.adminSetTopScorerGoals = (idx, goals) => { const tg=[...(state.adminRes.topScorerGoals||["","",""])]; tg[idx]=goals; state.adminRes={...state.adminRes, topScorerGoals: tg}; render(); };
 window.adminSaveAll = async () => { state.adminSaving=true; render(); await fb.set("results",state.adminRes); state.results={...state.adminRes}; state.adminSaving=false; render(); };
