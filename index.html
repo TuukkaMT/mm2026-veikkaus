@@ -184,8 +184,31 @@ const PLAYERS = [
   {n:"Kylian Mbappé",c:"Ranska",club:"Real Madrid"},{n:"Harry Kane",c:"Englanti",club:"Bayern München"},{n:"Erling Haaland",c:"Norja",club:"Man City"},{n:"Lionel Messi",c:"Argentiina",club:"Inter Miami"},{n:"Lamine Yamal",c:"Espanja",club:"Barcelona"},{n:"Vinicius Jr.",c:"Brasilia",club:"Real Madrid"},{n:"Cristiano Ronaldo",c:"Portugali",club:"Al-Nassr"},{n:"Jude Bellingham",c:"Englanti",club:"Real Madrid"},{n:"Julián Álvarez",c:"Argentiina",club:"Atlético Madrid"},{n:"Mikel Oyarzabal",c:"Espanja",club:"Real Sociedad"},{n:"Bukayo Saka",c:"Englanti",club:"Arsenal"},{n:"Lautaro Martínez",c:"Argentiina",club:"Inter"},{n:"Mohamed Salah",c:"Egypti",club:"Liverpool"},{n:"Florian Wirtz",c:"Saksa",club:"Liverpool"},{n:"Phil Foden",c:"Englanti",club:"Man City"},{n:"Jamal Musiala",c:"Saksa",club:"Bayern München"},{n:"Bruno Fernandes",c:"Portugali",club:"Man United"},{n:"Raphinha",c:"Brasilia",club:"Barcelona"},{n:"Rafael Leão",c:"Portugali",club:"AC Milan"},{n:"Rodrygo",c:"Brasilia",club:"Real Madrid"},{n:"Ousmane Dembélé",c:"Ranska",club:"PSG"},{n:"Cole Palmer",c:"Englanti",club:"Chelsea"},{n:"Nico Williams",c:"Espanja",club:"Athletic Bilbao"},{n:"Kai Havertz",c:"Saksa",club:"Arsenal"},{n:"Romelu Lukaku",c:"Belgia",club:"Napoli"},{n:"Kevin De Bruyne",c:"Belgia",club:"Napoli"},{n:"Memphis Depay",c:"Alankomaat",club:"Corinthians"},{n:"Cody Gakpo",c:"Alankomaat",club:"Liverpool"},{n:"Christian Pulisic",c:"USA",club:"AC Milan"},{n:"Son Heung-min",c:"Etelä-Korea",club:"LAFC"},{n:"Darwin Núñez",c:"Uruguay",club:"Al-Hilal"},{n:"Endrick",c:"Brasilia",club:"Real Madrid"},{n:"Sadio Mané",c:"Senegal",club:"Al-Nassr"},{n:"Álvaro Morata",c:"Espanja",club:"Como"},{n:"Hwang Hee-chan",c:"Etelä-Korea",club:"Wolves"},{n:"Michael Olise",c:"Ranska",club:"Bayern München"},{n:"Marcus Thuram",c:"Ranska",club:"Inter"},{n:"Jérémy Doku",c:"Belgia",club:"Man City"},{n:"Ollie Watkins",c:"Englanti",club:"Aston Villa"},{n:"Folarin Balogun",c:"USA",club:"Monaco"},{n:"Raúl Jiménez",c:"Meksiko",club:"Fulham"},{n:"Santiago Giménez",c:"Meksiko",club:"AC Milan"},{n:"Niclas Füllkrug",c:"Saksa",club:"West Ham"},{n:"Gonçalo Ramos",c:"Portugali",club:"PSG"},{n:"Federico Valverde",c:"Uruguay",club:"Real Madrid"},{n:"Youssef En-Nesyri",c:"Marokko",club:"Fenerbahçe"},{n:"Brahim Díaz",c:"Marokko",club:"Real Madrid"},{n:"Mehdi Taremi",c:"Iran",club:"Inter"},{n:"Breel Embolo",c:"Sveitsi",club:"Monaco"},{n:"Kenan Yıldız",c:"Türkiye",club:"Juventus"}
 ];
 
+const MATCH_DATES = {
+  A1:"2026-06-11", A2:"2026-06-18", A3:"2026-06-24", A4:"2026-06-24", A5:"2026-06-18", A6:"2026-06-11",
+  B1:"2026-06-12", B2:"2026-06-18", B3:"2026-06-24", B4:"2026-06-24", B5:"2026-06-18", B6:"2026-06-13",
+  C1:"2026-06-13", C2:"2026-06-19", C3:"2026-06-24", C4:"2026-06-24", C5:"2026-06-19", C6:"2026-06-13",
+  D1:"2026-06-12", D2:"2026-06-19", D3:"2026-06-25", D4:"2026-06-25", D5:"2026-06-19", D6:"2026-06-13",
+  E1:"2026-06-14", E2:"2026-06-20", E3:"2026-06-25", E4:"2026-06-25", E5:"2026-06-20", E6:"2026-06-14",
+  F1:"2026-06-14", F2:"2026-06-20", F3:"2026-06-25", F4:"2026-06-25", F5:"2026-06-20", F6:"2026-06-14",
+  G1:"2026-06-15", G2:"2026-06-21", G3:"2026-06-26", G4:"2026-06-26", G5:"2026-06-21", G6:"2026-06-15",
+  H1:"2026-06-15", H2:"2026-06-21", H3:"2026-06-26", H4:"2026-06-26", H5:"2026-06-21", H6:"2026-06-15",
+  I1:"2026-06-16", I2:"2026-06-22", I3:"2026-06-26", I4:"2026-06-26", I5:"2026-06-22", I6:"2026-06-16",
+  J1:"2026-06-16", J2:"2026-06-22", J3:"2026-06-27", J4:"2026-06-27", J5:"2026-06-22", J6:"2026-06-16",
+  K1:"2026-06-17", K2:"2026-06-23", K3:"2026-06-27", K4:"2026-06-27", K5:"2026-06-23", K6:"2026-06-17",
+  L1:"2026-06-17", L2:"2026-06-23", L3:"2026-06-27", L4:"2026-06-27", L5:"2026-06-23", L6:"2026-06-17"
+};
+const FI_DAYS = ['su','ma','ti','ke','to','pe','la'];
+const formatMatchDate = (dateStr) => {
+  if(!dateStr) return "";
+  const d = new Date(dateStr+"T12:00:00");
+  return `${FI_DAYS[d.getDay()]} ${d.getDate()}.${d.getMonth()+1}.`;
+};
+
 const ALL_MATCHES = [];
-Object.entries(GROUPS).forEach(([g,teams])=>{let n=1;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)ALL_MATCHES.push({id:`${g}${n++}`,group:g,home:teams[i],away:teams[j]})});
+Object.entries(GROUPS).forEach(([g,teams])=>{let n=1;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++){const id=`${g}${n++}`;ALL_MATCHES.push({id,group:g,home:teams[i],away:teams[j],date:MATCH_DATES[id]||""});}});
+// Funktio joka palauttaa lohkon ottelut päivämääräjärjestyksessä
+const matchesByGroup = (g) => ALL_MATCHES.filter(m=>m.group===g).sort((a,b)=>(a.date||"").localeCompare(b.date||"")||a.id.localeCompare(b.id));
 const ALL_TEAMS = Object.values(GROUPS).flat();
 const EMPTY = ()=>({matches:{},advancement:[],r32:[],r16:[],qf:[],sf:[],champion:"",bronzeWinner:"",topScorers:["","",""],topScorerGoals:["","",""]});
 const { useState, useEffect, useRef, useCallback } = React;
@@ -358,7 +381,11 @@ function renderLogin(root) {
 
 function renderLohko(matchesDone, locked) {
   const s = state;
-  const groupMatches = ALL_MATCHES.filter(m=>m.group===s.group);
+  const groupMatches = matchesByGroup(s.group);
+  // Ryhmitä päivämäärän mukaan
+  const byDate = {};
+  groupMatches.forEach(m => { (byDate[m.date] = byDate[m.date] || []).push(m); });
+  const dates = Object.keys(byDate).sort();
   const grpTeams = GROUPS[s.group].map(t=>`${FLAGS[t]} ${t}${teamStar(t)?" ⭐":""}`).join("  ·  ");
   return `
     <div>
@@ -378,23 +405,29 @@ function renderLohko(matchesDone, locked) {
         <div style="font-family:var(--font-sport);font-size:16px;font-weight:600;letter-spacing:1px">LOHKO ${s.group}</div>
         <div style="font-size:12px;color:var(--color-text-tertiary);margin-top:3px">${grpTeams}</div>
       </div>
-      ${groupMatches.map(m=>{
-        const mp=s.preds.matches?.[m.id]||{};
-        const sg=sign(mp.h,mp.a);
-        const done=mp.h!==undefined&&mp.a!==undefined&&mp.h!==""&&mp.a!=="";
-        return `
-        <div class="match-row${done?" done":""}">
-          <span style="font-size:20px;min-width:24px">${FLAGS[m.home]}</span>
-          <span style="flex:1;font-size:13px;text-align:right;color:var(--color-text-primary)">${m.home} <span style="font-size:9px;color:var(--color-text-tertiary)">#${teamRank(m.home)}</span>${teamStar(m.home)?` <span class="star-mark">⭐</span>`:""}</span>
-          <div style="display:flex;align-items:center;gap:5px">
-            <input type="number" min="0" max="20" step="1" class="score-inp" ${locked?"disabled":""} value="${mp.h??""}" oninput="updateMatch('${m.id}','h',this.value)"/>
-            <div class="sign-badge${sg?` sign-${sg}`:""}">${sg||"–"}</div>
-            <input type="number" min="0" max="20" step="1" class="score-inp" ${locked?"disabled":""} value="${mp.a??""}" oninput="updateMatch('${m.id}','a',this.value)"/>
-          </div>
-          <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${teamStar(m.away)?`<span class="star-mark">⭐</span> `:""}<span style="font-size:9px;color:var(--color-text-tertiary)">#${teamRank(m.away)}</span> ${m.away}</span>
-          <span style="font-size:20px;min-width:24px;text-align:right">${FLAGS[m.away]}</span>
-        </div>`;
-      }).join("")}
+      ${dates.map(date => `
+        <div style="margin:14px 0 6px;display:flex;align-items:center;gap:8px">
+          <div style="font-family:var(--font-sport);font-size:11px;color:var(--pitch-green);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;padding:3px 10px;background:rgba(46,125,50,0.08);border-radius:10px;border:1px solid rgba(46,125,50,0.2)">${formatMatchDate(date)}</div>
+          <div style="flex:1;height:1px;background:var(--color-border-tertiary)"></div>
+        </div>
+        ${byDate[date].map(m=>{
+          const mp=s.preds.matches?.[m.id]||{};
+          const sg=sign(mp.h,mp.a);
+          const done=mp.h!==undefined&&mp.a!==undefined&&mp.h!==""&&mp.a!=="";
+          return `
+          <div class="match-row${done?" done":""}">
+            <span style="font-size:20px;min-width:24px">${FLAGS[m.home]}</span>
+            <span style="flex:1;font-size:13px;text-align:right;color:var(--color-text-primary)">${m.home} <span style="font-size:9px;color:var(--color-text-tertiary)">#${teamRank(m.home)}</span>${teamStar(m.home)?` <span class="star-mark">⭐</span>`:""}</span>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" min="0" max="20" step="1" class="score-inp" ${locked?"disabled":""} value="${mp.h??""}" oninput="updateMatch('${m.id}','h',this.value)"/>
+              <div class="sign-badge${sg?` sign-${sg}`:""}">${sg||"–"}</div>
+              <input type="number" min="0" max="20" step="1" class="score-inp" ${locked?"disabled":""} value="${mp.a??""}" oninput="updateMatch('${m.id}','a',this.value)"/>
+            </div>
+            <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${teamStar(m.away)?`<span class="star-mark">⭐</span> `:""}<span style="font-size:9px;color:var(--color-text-tertiary)">#${teamRank(m.away)}</span> ${m.away}</span>
+            <span style="font-size:20px;min-width:24px;text-align:right">${FLAGS[m.away]}</span>
+          </div>`;
+        }).join("")}
+      `).join("")}
       <div style="margin-top:14px;padding:12px 14px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:12px;color:var(--color-text-secondary);line-height:1.7">
         <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Tarkka tulos = 5p</strong> &nbsp;·&nbsp; <strong style="font-family:var(--font-sport);font-weight:600;letter-spacing:0.5px">Oikea 1X2 = 2p</strong>
         <br><span style="font-size:11px;color:var(--color-text-tertiary)">⭐ FIFA top 4 · #N = sijoitus FIFA-listalla</span>
@@ -429,10 +462,10 @@ function renderJatko(locked) {
 function renderPudotus(locked) {
   const s = state;
   const rounds = [
-    {key:"r32",label:"Kahdeksasfinaalit",max:16,pts:"4p/joukkue"},
-    {key:"r16",label:"Kuudestoistafinaalit",max:8,pts:"6p/joukkue"},
-    {key:"qf",label:"Neljännesfinaalit",max:4,pts:"8p/joukkue"},
-    {key:"sf",label:"Puolifinaalit — Finalistit",max:2,pts:"10p/joukkue"},
+    {key:"r32",label:"Parhaat 16",max:16,pts:"4p/joukkue"},
+    {key:"r16",label:"Parhaat 8",max:8,pts:"6p/joukkue"},
+    {key:"qf",label:"Välierät",max:4,pts:"8p/joukkue"},
+    {key:"sf",label:"Finalistit",max:2,pts:"10p/joukkue"},
   ];
   const ts = s.preds.topScorers || ["","",""];
   const tg = s.preds.topScorerGoals || ["","",""];
@@ -455,7 +488,6 @@ function renderPudotus(locked) {
 
       <div style="margin-top:24px;padding:16px;background:linear-gradient(135deg,rgba(205,127,50,0.1) 0%,rgba(205,127,50,0.02) 100%);border:1px solid #cd7f32;border-radius:var(--border-radius-lg)">
         <div class="sec-title" style="margin-top:0"><span style="font-size:18px">🥉</span>PRONSSIOTTELUN VOITTAJA <span style="margin-left:auto;font-size:11px;color:var(--color-text-tertiary)">8p</span></div>
-        <p style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:10px;line-height:1.5">Pronssiottelussa kohtaavat puolivälierien häviäjät. Veikkaa kuka voittaa MM-pronssin.</p>
         <div class="team-grid">${ALL_TEAMS.map(team=>`<button class="chip-base${state.preds.bronzeWinner===team?" chip-sel-w":""}" style="${state.preds.bronzeWinner===team?'background:linear-gradient(135deg,#cd7f32 0%,#8b4513 100%)!important;border-color:#8b4513!important;color:#fff!important;font-weight:600':''}" onclick="setBronzeWinner('${team.replace(/'/g,"\\\\'")}')" ${locked?"disabled style='opacity:.5'":""}><span>${FLAGS[team]}</span><span class="team-text">${team}${teamStar(team)?" ⭐":""}</span><span class="rank-tag">#${teamRank(team)}</span></button>`).join("")}</div>
       </div>
 
@@ -483,7 +515,7 @@ function renderPudotus(locked) {
 
       <div style="margin-top:20px;padding:14px 16px;background:var(--color-background-secondary);border-radius:var(--border-radius-lg);font-size:12px;color:var(--color-text-secondary);line-height:1.8">
         <div style="font-family:var(--font-sport);font-weight:600;color:var(--color-text-primary);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;font-size:13px"><i class="ti ti-info-circle" style="margin-right:4px"></i>Pisteytys</div>
-        Tarkka tulos: 5p &middot; Oikea 1X2: 2p &middot; Jatkoonpääsy: 2p &middot; R32/R16/QF/SF: 4/6/8/10p &middot; 🥉 Pronssi: 8p &middot; 🏆 Mestari: 12p &middot; Maalipörssi: 8/4/2p + tarkka maalimäärä 5/3/1p
+        Tarkka tulos: 5p &middot; Oikea 1X2: 2p &middot; Jatkoonpääsy: 2p &middot; Parhaat 16: 4p &middot; Parhaat 8: 6p &middot; Välierät: 8p &middot; Finalistit: 10p &middot; 🥉 Pronssi: 8p &middot; 🏆 Mestari: 12p &middot; Maalipörssi: 8/4/2p + tarkka maalimäärä 5/3/1p
       </div>
     </div>
   `;
@@ -559,31 +591,43 @@ function renderByPlayer() {
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
         ${"ABCDEFGHIJKL".split("").map(g=>`<button onclick="setGroup('${g}')" class="grp-btn${s.group===g?' active':''}">${g}</button>`).join("")}
       </div>
-      ${ALL_MATCHES.filter(m=>m.group===s.group).map(m => {
-        const mp = selected.matches?.[m.id];
-        const hasPred = mp?.h!==undefined&&mp.h!=="";
-        const sg = hasPred ? sign(mp.h, mp.a) : null;
-        const cons = countMatchPicks(m.id);
-        const consSign = Object.entries(cons.counts).sort((a,b)=>b[1]-a[1])[0]?.[0];
-        const consCount = cons.counts[consSign];
-        const consMatch = sg && sg === consSign && consCount >= cons.total * 0.6;
-        return `
-          <div class="match-row${hasPred?" done":""}" style="opacity:${hasPred?1:0.4}">
-            <span style="font-size:18px;min-width:22px">${FLAGS[m.home]}</span>
-            <span style="flex:1;font-size:12px;text-align:right">${m.home}</span>
-            <div style="display:flex;align-items:center;gap:5px">
-              ${hasPred?`<span class="score-display">${mp.h}-${mp.a}</span><div class="sign-badge sign-${sg}">${sg}</div>`:`<span style="color:var(--color-text-tertiary);font-size:12px">—</span>`}
-            </div>
-            <span style="flex:1;font-size:12px">${m.away}</span>
-            <span style="font-size:18px;min-width:22px;text-align:right">${FLAGS[m.away]}</span>
+      ${(() => {
+        const grpMs = matchesByGroup(s.group);
+        const byD = {};
+        grpMs.forEach(m => { (byD[m.date] = byD[m.date] || []).push(m); });
+        const ds = Object.keys(byD).sort();
+        return ds.map(date => `
+          <div style="margin:12px 0 4px;display:flex;align-items:center;gap:8px">
+            <div style="font-family:var(--font-sport);font-size:10px;color:var(--pitch-green);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;padding:2px 8px;background:rgba(46,125,50,0.08);border-radius:8px;border:1px solid rgba(46,125,50,0.2)">${formatMatchDate(date)}</div>
+            <div style="flex:1;height:1px;background:var(--color-border-tertiary)"></div>
           </div>
-          ${hasPred && cons.total>0 ? `
-            <div style="font-size:10px;color:var(--color-text-tertiary);text-align:right;margin:-2px 10px 6px;padding-right:30px">
-              Konsensus: <strong>${consSign}</strong> ${cons.counts[consSign]}/${cons.total}${consMatch?' <span style="color:var(--gold)">👑 sama</span>':''}
-            </div>
-          ` : ''}
-        `;
-      }).join('')}
+          ${byD[date].map(m => {
+            const mp = selected.matches?.[m.id];
+            const hasPred = mp?.h!==undefined&&mp.h!=="";
+            const sg = hasPred ? sign(mp.h, mp.a) : null;
+            const cons = countMatchPicks(m.id);
+            const consSign = Object.entries(cons.counts).sort((a,b)=>b[1]-a[1])[0]?.[0];
+            const consCount = cons.counts[consSign];
+            const consMatch = sg && sg === consSign && consCount >= cons.total * 0.6;
+            return `
+              <div class="match-row${hasPred?" done":""}" style="opacity:${hasPred?1:0.4}">
+                <span style="font-size:18px;min-width:22px">${FLAGS[m.home]}</span>
+                <span style="flex:1;font-size:12px;text-align:right">${m.home}</span>
+                <div style="display:flex;align-items:center;gap:5px">
+                  ${hasPred?`<span class="score-display">${mp.h}-${mp.a}</span><div class="sign-badge sign-${sg}">${sg}</div>`:`<span style="color:var(--color-text-tertiary);font-size:12px">—</span>`}
+                </div>
+                <span style="flex:1;font-size:12px">${m.away}</span>
+                <span style="font-size:18px;min-width:22px;text-align:right">${FLAGS[m.away]}</span>
+              </div>
+              ${hasPred && cons.total>0 ? `
+                <div style="font-size:10px;color:var(--color-text-tertiary);text-align:right;margin:-2px 10px 6px;padding-right:30px">
+                  Konsensus: <strong>${consSign}</strong> ${cons.counts[consSign]}/${cons.total}${consMatch?' <span style="color:var(--gold)">👑 sama</span>':''}
+                </div>
+              ` : ''}
+            `;
+          }).join('')}
+        `).join('');
+      })()}
 
       <div class="sec-title">Jatkoonpääsy <span class="badge">${(selected.advancement||[]).length}/32</span></div>
       <div class="team-grid" style="margin-bottom:14px">
@@ -598,9 +642,9 @@ function renderByPlayer() {
       </div>
 
       ${[
-        {key:"r32",label:"Kahdeksasfinaalit (R32)",max:16},
-        {key:"r16",label:"Kuudestoistafinaalit (R16)",max:8},
-        {key:"qf",label:"Neljännesfinaalit (QF)",max:4},
+        {key:"r32",label:"Parhaat 16",max:16},
+        {key:"r16",label:"Parhaat 8",max:8},
+        {key:"qf",label:"Välierät",max:4},
         {key:"sf",label:"Finalistit",max:2}
       ].map(({key,label,max}) => {
         const teams = selected[key] || [];
@@ -658,7 +702,7 @@ function renderByMatch() {
   return `
     <div>
       <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px">
-        ${[["ottelut","Ottelut"],["jatko","Jatkoon"],["r32","R32"],["r16","R16"],["qf","QF"],["sf","Finalistit"],["pronssi","Pronssi"],["mestari","Mestari"],["maalit","Maalipörssi"]].map(([k,l])=>`
+        ${[["ottelut","Ottelut"],["jatko","Jatkoon"],["r32","Parhaat 16"],["r16","Parhaat 8"],["qf","Välierät"],["sf","Finalistit"],["pronssi","Pronssi"],["mestari","Mestari"],["maalit","Maalipörssi"]].map(([k,l])=>`
           <button onclick="state.veikkausSection='${k}';render()" class="subtab-btn ${s.veikkausSection===k?'active':''}">${l}</button>
         `).join('')}
       </div>
@@ -716,7 +760,7 @@ function renderByMatchOttelut() {
 
 function renderByMatchTeamList(key) {
   const s = state;
-  const labels = {advancement:"Jatkoon (32 joukkuetta)", r32:"R32 voittajat (16)", r16:"R16 voittajat (8)", qf:"QF voittajat (4)", sf:"Finalistit (2)"};
+  const labels = {advancement:"Jatkoon (32 joukkuetta)", r32:"Parhaat 16", r16:"Parhaat 8", qf:"Välierät (4 joukkuetta)", sf:"Finalistit (2 joukkuetta)"};
   const counts = {};
   s.allPreds.forEach(p => {
     (p[key] || []).forEach(team => {
@@ -882,8 +926,11 @@ function renderAdmin() {
       ${s.adminPw&&s.adminPw!==ADMIN_PW?`<p style="font-size:12px;color:var(--color-text-danger);margin-top:8px">Väärä salasana</p>`:""}
     </div>
   `;
-  const grpMatches = ALL_MATCHES.filter(m=>m.group===s.adminGrp);
-  const adminRounds = [{key:"advancement",label:"Todelliset jatkoonpääsijät",max:32},{key:"r32",label:"R32 voittajat",max:16},{key:"r16",label:"R16 voittajat",max:8},{key:"qf",label:"QF voittajat",max:4},{key:"sf",label:"Finalistit",max:2}];
+  const grpMatches = matchesByGroup(s.adminGrp);
+  const grpMatchesByDate = {};
+  grpMatches.forEach(m => { (grpMatchesByDate[m.date] = grpMatchesByDate[m.date] || []).push(m); });
+  const grpDates = Object.keys(grpMatchesByDate).sort();
+  const adminRounds = [{key:"advancement",label:"Todelliset jatkoonpääsijät",max:32},{key:"r32",label:"Parhaat 16",max:16},{key:"r16",label:"Parhaat 8",max:8},{key:"qf",label:"Välierät",max:4},{key:"sf",label:"Finalistit",max:2}];
   const ts = s.adminRes.topScorers || ["","",""];
   const tg = s.adminRes.topScorerGoals || ["","",""];
   const medals = ["🥇","🥈","🥉"];
@@ -905,9 +952,9 @@ function renderAdmin() {
   const statusItems = [
     {label:"⚽ Ottelut", count:matchesEntered, total:72},
     {label:"📋 Jatkoon", count:advCount, total:32},
-    {label:"R32 voittajat", count:r32Count, total:16},
-    {label:"R16 voittajat", count:r16Count, total:8},
-    {label:"QF voittajat", count:qfCount, total:4},
+    {label:"Parhaat 16", count:r32Count, total:16},
+    {label:"Parhaat 8", count:r16Count, total:8},
+    {label:"Välierät", count:qfCount, total:4},
     {label:"Finalistit", count:sfCount, total:2},
     {label:"🥉 Pronssin voittaja", count:hasBronze?1:0, total:1},
     {label:"🏆 Mestari", count:hasChamp?1:0, total:1},
@@ -950,20 +997,26 @@ function renderAdmin() {
         ${"ABCDEFGHIJKL".split("").map(g=>`<button onclick="setAdminGrp('${g}')" class="grp-btn${s.adminGrp===g?" active":""}">${g}</button>`).join("")}
       </div>
       <div style="margin-bottom:8px;font-family:var(--font-sport);font-size:12px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px">Lohko ${s.adminGrp} — syötä todelliset tulokset</div>
-      ${grpMatches.map(m=>{
-        const r=s.adminRes.matches?.[m.id]||{};
-        return `<div class="match-row" style="margin-bottom:4px">
-          <span style="font-size:17px">${FLAGS[m.home]}</span>
-          <span style="flex:1;font-size:13px;text-align:right;color:var(--color-text-primary)">${m.home}</span>
-          <div style="display:flex;align-items:center;gap:5px">
-            <input type="number" min="0" max="20" step="1" class="score-inp" style="width:42px;height:38px;font-size:17px" value="${r.h??""}" oninput="adminUpdateMatch('${m.id}','h',this.value)"/>
-            <span style="color:var(--color-text-tertiary);font-weight:500;font-size:14px">–</span>
-            <input type="number" min="0" max="20" step="1" class="score-inp" style="width:42px;height:38px;font-size:17px" value="${r.a??""}" oninput="adminUpdateMatch('${m.id}','a',this.value)"/>
-          </div>
-          <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${m.away}</span>
-          <span style="font-size:17px">${FLAGS[m.away]}</span>
-        </div>`;
-      }).join("")}
+      ${grpDates.map(date => `
+        <div style="margin:10px 0 4px;display:flex;align-items:center;gap:8px">
+          <div style="font-family:var(--font-sport);font-size:10px;color:var(--pitch-green);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;padding:2px 8px;background:rgba(46,125,50,0.08);border-radius:8px;border:1px solid rgba(46,125,50,0.2)">${formatMatchDate(date)}</div>
+          <div style="flex:1;height:1px;background:var(--color-border-tertiary)"></div>
+        </div>
+        ${grpMatchesByDate[date].map(m=>{
+          const r=s.adminRes.matches?.[m.id]||{};
+          return `<div class="match-row" style="margin-bottom:4px">
+            <span style="font-size:17px">${FLAGS[m.home]}</span>
+            <span style="flex:1;font-size:13px;text-align:right;color:var(--color-text-primary)">${m.home}</span>
+            <div style="display:flex;align-items:center;gap:5px">
+              <input type="number" min="0" max="20" step="1" class="score-inp" style="width:42px;height:38px;font-size:17px" value="${r.h??""}" oninput="adminUpdateMatch('${m.id}','h',this.value)"/>
+              <span style="color:var(--color-text-tertiary);font-weight:500;font-size:14px">–</span>
+              <input type="number" min="0" max="20" step="1" class="score-inp" style="width:42px;height:38px;font-size:17px" value="${r.a??""}" oninput="adminUpdateMatch('${m.id}','a',this.value)"/>
+            </div>
+            <span style="flex:1;font-size:13px;color:var(--color-text-primary)">${m.away}</span>
+            <span style="font-size:17px">${FLAGS[m.away]}</span>
+          </div>`;
+        }).join("")}
+      `).join("")}
       ${adminRounds.map(({key,label,max})=>{
         const cur=(s.adminRes[key]||[]);
         return `<div class="sec-title">${label} <span class="badge${cur.length===max?" ok":""}">${cur.length} / ${max}</span></div>
@@ -1004,20 +1057,10 @@ function renderAdmin() {
           </div>
           ${isThisDelete&&s.deleteStep===1?`
             <div class="danger-box">
-              <p style="font-size:13px;color:var(--color-text-danger);margin-bottom:10px;line-height:1.5"><strong>Vaihe 1/3:</strong> Aiotko poistaa käyttäjän <strong>${u.name}</strong>? Tämä poistaa kaikki veikkaukset pysyvästi.</p>
+              <p style="font-size:13px;color:var(--color-text-danger);margin-bottom:10px;line-height:1.5"><strong>Vahvista poisto:</strong> Käyttäjä <strong>${u.name}</strong> ja kaikki hänen veikkauksensa poistetaan pysyvästi.</p>
               <div style="display:flex;gap:8px">
                 <button onclick="deleteUserCancel()" class="btn-secondary">Peruuta</button>
-                <button onclick="deleteUserStep2()" class="btn-danger">Jatka poistoon</button>
-              </div>
-            </div>
-          `:""}
-          ${isThisDelete&&s.deleteStep===2?`
-            <div class="danger-box">
-              <p style="font-size:13px;color:var(--color-text-danger);margin-bottom:10px;line-height:1.5"><strong>Vaihe 2/3:</strong> Kirjoita käyttäjän nimi <strong>"${u.name}"</strong> vahvistaaksesi.</p>
-              <input type="text" placeholder="Kirjoita nimi tähän" value="${s.deleteConfirmName||""}" oninput="state.deleteConfirmName=this.value; render()" style="width:100%;padding:8px 12px;background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;margin-bottom:10px;font-family:var(--font-sans);box-sizing:border-box;color:var(--color-text-primary)"/>
-              <div style="display:flex;gap:8px">
-                <button onclick="deleteUserCancel()" class="btn-secondary">Peruuta</button>
-                <button onclick="deleteUserConfirm()" ${s.deleteConfirmName!==u.name?"disabled":""} class="btn-danger">Vahvista (vaihe 3/3)</button>
+                <button onclick="deleteUserConfirm()" class="btn-danger">Kyllä, poista ${u.name}</button>
               </div>
             </div>
           `:""}
@@ -1126,14 +1169,13 @@ window.loadUsers = async () => {
   } else { state.usersList = []; }
   render();
 };
-window.deleteUserStep1 = (uid) => { state.deleteStep = 1; state.deleteUid = uid; state.deleteConfirmName = ""; render(); };
-window.deleteUserStep2 = () => { state.deleteStep = 2; state.deleteConfirmName = ""; render(); };
-window.deleteUserCancel = () => { state.deleteStep = 0; state.deleteUid = null; state.deleteConfirmName = ""; render(); };
+window.deleteUserStep1 = (uid) => { state.deleteStep = 1; state.deleteUid = uid; render(); };
+window.deleteUserCancel = () => { state.deleteStep = 0; state.deleteUid = null; render(); };
 window.deleteUserConfirm = async () => {
   const user = state.usersList.find(u=>u.uid===state.deleteUid);
-  if(!user || state.deleteConfirmName !== user.name) return;
+  if(!user) return;
   await fb.del(`predictions/${state.deleteUid}`);
-  state.deleteStep = 0; state.deleteUid = null; state.deleteConfirmName = "";
+  state.deleteStep = 0; state.deleteUid = null;
   await window.loadUsers();
 };
 
